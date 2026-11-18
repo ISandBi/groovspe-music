@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "GrooveSpace Music",
+    "slug": "groovspe-music",
+    "scheme": "groovespacemusic",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#100d17",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "mx.groovespace.music",
+      "infoPlist": { "UIBackgroundModes": ["audio"] }
+    },
+    "android": {
+      "package": "mx.groovespace.music",
+      "permissions": ["FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MEDIA_PLAYBACK"]
+    },
+    "web": { "bundler": "metro" },
+    "plugins": [
+      "expo-router",
+      ["expo-audio", { "enableBackgroundPlayback": true, "recordAudioAndroid": false, "microphonePermission": false }]
+    ],
+    "experiments": { "typedRoutes": false }
+  }
+}
