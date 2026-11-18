@@ -27,6 +27,17 @@ npx expo start
 - Presiona `a` para el emulador Android, `i` para el simulador iOS.
 - Si algo falla: `npx expo-doctor`.
 
+## Cuentas de banda y de oyente
+
+- Entra con el **mismo correo y contraseña** que usaste para registrar tu banda en el sitio de GrooveSpace: la app te muestra el **panel de banda** (demos, cuenta).
+- Cualquier otra cuenta es de **oyente**. Para que la app hable con tu backend, define la URL en `.env` (no `localhost`):
+  `EXPO_PUBLIC_API_URL=http://192.168.1.86:4000` (usa la IP de tu computadora y el puerto de tu backend), y reinicia con `npx expo start -c`.
+
+## Pantalla de bloqueo y audio en segundo plano
+
+Expo Go no incluye el servicio nativo de `expo-audio` para esto. Para activarlo, crea un *development build*:
+`eas build --profile development --platform android`, instala el APK y usa `EXPO_PUBLIC_LOCK_SCREEN=1`.
+
 ## Compilar para instalar (EAS Build)
 
 ```bash

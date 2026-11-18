@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { SONGS, RULES, songById, bandById } from './data';
 import { reportValidPlay } from './lib/api';
+import { LOCK_SCREEN } from './lib/config';
 
 const KEY = 'groovespace-music-v1';
 const Ctx = createContext(null);
@@ -12,7 +13,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 export function AppProvider({ children }) {
   const [ready, setReady] = useState(false);
-  const [user, setUser] = useState(null); // { name, email }
+  const [user, setUser] = useState(null); // { role: 'listener' | 'band', name, email, bandId?, token? }
   const [premium, setPremium] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [recent, setRecent] = useState([]);
@@ -40,7 +41,7 @@ export function AppProvider({ children }) {
       } catch (e) { /* sin datos previos */ }
       setReady(true);
     })();
-    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true, interruptionMode: 'doNotMix' }).catch(() => {});
+    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: LOCK_SCREEN, interruptionMode: 'doNotMix' }).catch(() => {});
   }, []);
   useEffect(() => {
     if (!ready) return;
@@ -51,6 +52,7 @@ export function AppProvider({ children }) {
 
   const current = currentId ? songById(currentId) : null;
   const band = current ? bandById(current.bandId) : null;
+  const isBand = user?.role === 'band';
 
   const play = useCallback((songId, list) => {
     const song = songById(songId);
@@ -62,7 +64,7 @@ export function AppProvider({ children }) {
     if (loaded.current !== songId) {
       player.replace({ uri: song.url });
       loaded.current = songId;
-      try { player.setActiveForLockScreen(true, { title: song.title, artist: bandById(song.bandId).name, albumTitle: 'GrooveSpace Music' }); } catch (e) {}
+      if (LOCK_SCREEN) try { player.setActiveForLockScreen(true, { title: song.title, artist: bandById(song.bandId).name, albumTitle: 'GrooveSpace Music' }); } catch (e) {}
     }
     player.play();
   }, [player]);
@@ -109,10 +111,10 @@ export function AppProvider({ children }) {
   }, []);
 
   const value = useMemo(() => ({
-    ready, user, setUser, premium, setPremium, favorites, toggleFav, recent, plays,
+    ready, user, setUser, isBand, premium, setPremium, favorites, toggleFav, recent, plays,
     current, band, status, play, toggle, step, seek, queue, toast, showToast, adGate, setAdGate,
     logout: () => { setUser(null); player.pause(); },
-  }), [ready, user, premium, favorites, recent, plays, current, band, status, queue, toast, adGate]); // eslint-disable-line
+  }), [ready, user, isBand, premium, favorites, recent, plays, current, band, status, queue, toast, adGate]); // eslint-disable-line
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

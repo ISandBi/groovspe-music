@@ -7,5 +7,6 @@ import { colors } from '../src/theme';
 export default function Index() {
   const { ready, user } = useApp();
   if (!ready) return <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center' }}><ActivityIndicator color={colors.lime} /></View>;
-  return <Redirect href={user ? '/(tabs)/home' : '/welcome'} />;
+  if (!user) return <Redirect href="/welcome" />;
+  return <Redirect href={user.role === 'band' ? '/(band)/panel' : '/(tabs)/home'} />;
 }
