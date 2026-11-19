@@ -36,7 +36,7 @@ export default function MiniPlayer({ bottom }) {
 }
 const s = StyleSheet.create({
   wrap: { position: 'absolute', left: 10, right: 10, height: MINI_HEIGHT, zIndex: 20 },
-  card: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.raised, borderRadius: 18, paddingHorizontal: 10, borderWidth: 1, borderColor: colors.line, overflow: 'hidden' },
+  card: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.raised, borderRadius: 12, paddingHorizontal: 10, borderWidth: 1, borderColor: colors.line, overflow: 'hidden' },
   play: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.lime, alignItems: 'center', justifyContent: 'center' },
   track: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 3, backgroundColor: 'rgba(255,255,255,0.08)' },
   fill: { height: 3, backgroundColor: colors.lime },

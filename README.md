@@ -4,6 +4,10 @@ App móvil (iOS y Android) de **GrooveSpace**: los oyentes se registran y escuch
 
 Hecha con **React Native + Expo (Expo Router)**. Proyecto académico.
 
+## Funciones
+
+Inicio con accesos rápidos y estanterías, buscador con tiles por género, biblioteca (listas propias, favoritas, bandas que sigues), listas editoriales de GrooveSpace, perfil de banda con *Seguir*, cola, aleatorio, repetir (todo/una), menú “⋯” por canción (favorita, añadir a lista, añadir a la cola), reproductor con fondo degradado según la banda y mini-reproductor. Interfaz separada para cuentas de banda.
+
 ## Qué necesitas instalar
 
 1. **Node.js LTS** (https://nodejs.org) — incluye `npm`.

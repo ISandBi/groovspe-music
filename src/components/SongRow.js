@@ -9,22 +9,25 @@ import { bandById } from '../data';
 import { clock, compact } from '../lib/format';
 import { useApp } from '../store';
 
-export default function SongRow({ song, list, index }) {
-  const { current, status, play, favorites, toggleFav } = useApp();
+export default function SongRow({ song, list, index, context, showPlays = true }) {
+  const { current, status, play, favorites, openSheet } = useApp();
   const band = bandById(song.bandId);
   const active = current?.id === song.id;
   const fav = favorites.includes(song.id);
   return (
-    <Press onPress={() => play(song.id, list)} scale={0.98} style={s.row} accessibilityRole="button" accessibilityLabel={`Reproducir ${song.title} de ${band.name}`}>
+    <Press onPress={() => play(song.id, list, context)} onLongPress={() => openSheet(song.id)} scale={0.98} style={s.row} accessibilityRole="button" accessibilityLabel={`Reproducir ${song.title} de ${band.name}`}>
       {index != null && !active && <Text style={s.idx}>{index + 1}</Text>}
       {active && <View style={s.idxBox}><EqBars active={status.playing} /></View>}
-      <Cover band={band} size={48} radius={10} />
+      <Cover band={band} size={50} radius={8} seed={song.id} />
       <View style={{ flex: 1 }}>
         <Text numberOfLines={1} style={[type.h3, active && { color: colors.lime }]}>{song.title}</Text>
-        <Text numberOfLines={1} style={type.small}>{band.name} · {clock(song.duration)} · {compact(song.plays)} reprod.</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {fav && <Ionicons name="heart" size={12} color={colors.pink} />}
+          <Text numberOfLines={1} style={[type.small, { flex: 1 }]}>{band.name}{showPlays ? ` · ${compact(song.plays)} reprod.` : ` · ${clock(song.duration)}`}</Text>
+        </View>
       </View>
-      <Press onPress={() => toggleFav(song.id)} scale={0.8} hitSlop={10} accessibilityLabel="Favorito">
-        <Ionicons name={fav ? 'heart' : 'heart-outline'} size={22} color={fav ? colors.pink : colors.muted} />
+      <Press onPress={() => openSheet(song.id)} scale={0.8} hitSlop={12} accessibilityLabel="Más opciones">
+        <Ionicons name="ellipsis-horizontal" size={20} color={colors.muted} />
       </Press>
     </Press>
   );

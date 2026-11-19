@@ -34,6 +34,17 @@ export const ADS = [
   { id: 'a3', kicker: 'NUEVAS BANDAS', title: 'Descubre a Vidrio Líquido', text: 'Electrónica grabada en Estudio Cristal.', cta: 'Escuchar', colors: ['#b28aff', '#2cd5c4'] },
 ];
 
+// Listas editoriales de GrooveSpace (solo lectura).
+export const PLAYLISTS = [
+  { id: 'e1', name: 'Noches de CDMX', desc: 'Guitarras, neón y madrugada en la ciudad.', colors: ['#ff5d8f', '#6a2cff'], songIds: ['s1', 's5', 's9', 's10', 's3'] },
+  { id: 'e2', name: 'Para bailar', desc: 'Cumbia psicodélica y groove sin parar.', colors: ['#ffb84d', '#e0302f'], songIds: ['s7', 's8', 's2', 's9'] },
+  { id: 'e3', name: 'Folk de sala', desc: 'Acústico grabado en vivo, sin filtros.', colors: ['#c2ff3c', '#0fa968'], songIds: ['s3', 's4', 's2'] },
+  { id: 'e4', name: 'Ruido pesado', desc: 'Compases impares y mucha distorsión.', colors: ['#9aa0ff', '#2b1d4d'], songIds: ['s11', 's12', 's6', 's1'] },
+  { id: 'e5', name: 'Grabado en GrooveSpace', desc: 'Todo el catálogo, de punta a punta.', colors: ['#4db8ff', '#1b2a8a'], songIds: SONGS.map((x) => x.id) },
+  { id: 'e6', name: 'Electrónica y cumbia', desc: 'Sintetizadores que no se quedan quietos.', colors: ['#b28aff', '#2cd5c4'], songIds: ['s7', 's8', 's9', 's10'] },
+];
+export const playlistById = (id) => PLAYLISTS.find((p) => p.id === id);
+
 export const GENRES = ['Todo', 'Rock alternativo', 'Folk / Indie', 'Post-punk', 'Cumbia psicodélica', 'Electrónica', 'Metal progresivo'];
 
 export const bandById = (id) => BANDS.find((b) => b.id === id);

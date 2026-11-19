@@ -18,7 +18,7 @@ export default function BandScreen() {
   const band = bandById(id);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { play } = useApp();
+  const { play, followed, toggleFollow } = useApp();
   if (!band) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   const songs = songsOfBand(band.id);
   const ids = songs.map((x) => x.id);
@@ -35,15 +35,18 @@ export default function BandScreen() {
         </LinearGradient>
 
         <FadeIn delay={120} style={{ paddingHorizontal: 20, marginTop: 4 }}>
-          <Press onPress={() => play(ids[0], ids)} style={s.playAll}>
-            <Ionicons name="play" size={18} color={colors.onLime} />
-            <Text style={s.playAllTxt}>Reproducir</Text>
-          </Press>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <Press onPress={() => toggleFollow(band.id)} scale={0.94} style={[s.follow, followed.includes(band.id) && { borderColor: colors.lime }]}>
+              <Text style={[s.followTxt, followed.includes(band.id) && { color: colors.lime }]}>{followed.includes(band.id) ? 'Siguiendo' : 'Seguir'}</Text>
+            </Press>
+            <View style={{ flex: 1 }} />
+            <Press onPress={() => play(ids[0], ids, band.name)} scale={0.92} style={s.bigPlay} accessibilityLabel="Reproducir"><Ionicons name="play" size={28} color={colors.onLime} style={{ marginLeft: 3 }} /></Press>
+          </View>
         </FadeIn>
 
         <FadeIn delay={200} style={{ paddingHorizontal: 20, marginTop: 24 }}>
-          <Text style={type.h2}>Canciones</Text>
-          <View style={{ marginTop: 8 }}>{songs.map((song, i) => <SongRow key={song.id} song={song} index={i} list={ids} />)}</View>
+          <Text style={type.h2}>Populares</Text>
+          <View style={{ marginTop: 8 }}>{songs.map((song, i) => <SongRow key={song.id} song={song} index={i} list={ids} context={band.name} />)}</View>
         </FadeIn>
 
         <FadeIn delay={280} style={{ paddingHorizontal: 20, marginTop: 24 }}>
@@ -64,6 +67,9 @@ const s = StyleSheet.create({
   kicker: { color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: '800', letterSpacing: 1.4 },
   name: { color: '#fff', fontSize: 40, fontWeight: '900', letterSpacing: -1.5, marginTop: 4 },
   meta: { color: 'rgba(255,255,255,0.9)', marginTop: 4, fontSize: 14 },
+  follow: { paddingHorizontal: 20, paddingVertical: 9, borderRadius: 999, borderWidth: 1.5, borderColor: colors.muted },
+  followTxt: { color: colors.text, fontWeight: '700', fontSize: 13 },
+  bigPlay: { width: 60, height: 60, borderRadius: 30, backgroundColor: colors.lime, alignItems: 'center', justifyContent: 'center' },
   playAll: { flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center', gap: 8, backgroundColor: colors.lime, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 999 },
   playAllTxt: { color: colors.onLime, fontWeight: '800', fontSize: 15 },
   credit: { flexDirection: 'row', gap: 12, alignItems: 'center', marginTop: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: colors.line },
