@@ -2,8 +2,8 @@
 const SAMPLE = (n) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`;
 
 export const BANDS = [
-  { id: 'b1', name: 'Neón Pantera', genre: 'Rock alternativo', city: 'Coyoacán, CDMX', colors: ['#ff5d8f', '#6a2cff'], listeners: 12840, bio: 'Cuatro amigos, una sala de ensayo y mucho reverb. Grabaron su primer EP en la Sala Pulso de GrooveSpace con ingeniería de Diego R.', engineer: 'Diego R.', recorded: 'Sala Pulso' },
-  { id: 'b2', name: 'Ceiba Sonora', genre: 'Folk / Indie', city: 'Roma Norte, CDMX', colors: ['#c2ff3c', '#0fa968'], listeners: 8310, bio: 'Folk urbano con guitarras acústicas y percusión de objetos cotidianos. Sesión en vivo multitrack incluida.', engineer: 'Marian L.', recorded: 'Sala Bosque' },
+  { id: 'b1', name: 'Neón Pantera', genre: 'Rock alternativo', city: 'Coyoacán, CDMX', colors: ['#ff4f8b', '#8b5cff'], listeners: 12840, bio: 'Cuatro amigos, una sala de ensayo y mucho reverb. Grabaron su primer EP en la Sala Pulso de GrooveSpace con ingeniería de Diego R.', engineer: 'Diego R.', recorded: 'Sala Pulso' },
+  { id: 'b2', name: 'Ceiba Sonora', genre: 'Folk / Indie', city: 'Roma Norte, CDMX', colors: ['#c8ff3d', '#12c28a'], listeners: 8310, bio: 'Folk urbano con guitarras acústicas y percusión de objetos cotidianos. Sesión en vivo multitrack incluida.', engineer: 'Marian L.', recorded: 'Sala Bosque' },
   { id: 'b3', name: 'Concreto Azul', genre: 'Post-punk', city: 'Iztapalapa, CDMX', colors: ['#4db8ff', '#1b2a8a'], listeners: 6120, bio: 'Bajos densos, voces frías y letras sobre la ciudad que nunca duerme.', engineer: 'Diego R.', recorded: 'Sala Pulso' },
   { id: 'b4', name: 'La Última Rumba', genre: 'Cumbia psicodélica', city: 'Tlalpan, CDMX', colors: ['#ffb84d', '#e0302f'], listeners: 15990, bio: 'Cumbia con sintetizadores analógicos y mucho groove para bailar hasta tarde.', engineer: 'Marian L.', recorded: 'Sala Bosque' },
   { id: 'b5', name: 'Vidrio Líquido', genre: 'Electrónica', city: 'Condesa, CDMX', colors: ['#b28aff', '#2cd5c4'], listeners: 4380, bio: 'Beats suaves y texturas de vidrio. Música para estudiar, manejar de noche o no hacer nada.', engineer: 'Diego R.', recorded: 'Estudio Cristal' },
@@ -29,23 +29,24 @@ export const SONGS = [
 
 // Anuncios propios de GrooveSpace (versión gratuita).
 export const ADS = [
-  { id: 'a1', kicker: 'EVENTO', title: 'Noche de Bandas Nuevas', text: 'Viernes 21:00 · 4 bandas de GrooveSpace en vivo.', cta: 'Ver cartel', colors: ['#ff5d8f', '#6a2cff'] },
-  { id: 'a2', kicker: 'RENTA DE SALAS', title: 'Ensaya desde $220/h', text: 'Salas equipadas con consola y backline.', cta: 'Reservar', colors: ['#c2ff3c', '#0fa968'] },
+  { id: 'a1', kicker: 'EVENTO', title: 'Noche de Bandas Nuevas', text: 'Viernes 21:00 · 4 bandas de GrooveSpace en vivo.', cta: 'Ver cartel', colors: ['#ff4f8b', '#8b5cff'] },
+  { id: 'a2', kicker: 'RENTA DE SALAS', title: 'Ensaya desde $220/h', text: 'Salas equipadas con consola y backline.', cta: 'Reservar', colors: ['#c8ff3d', '#12c28a'] },
   { id: 'a3', kicker: 'NUEVAS BANDAS', title: 'Descubre a Vidrio Líquido', text: 'Electrónica grabada en Estudio Cristal.', cta: 'Escuchar', colors: ['#b28aff', '#2cd5c4'] },
 ];
 
 // Listas editoriales de GrooveSpace (solo lectura).
 export const PLAYLISTS = [
-  { id: 'e1', name: 'Noches de CDMX', desc: 'Guitarras, neón y madrugada en la ciudad.', colors: ['#ff5d8f', '#6a2cff'], songIds: ['s1', 's5', 's9', 's10', 's3'] },
+  { id: 'e1', name: 'Noches de CDMX', desc: 'Guitarras, neón y madrugada en la ciudad.', colors: ['#ff4f8b', '#8b5cff'], songIds: ['s1', 's5', 's9', 's10', 's3'] },
   { id: 'e2', name: 'Para bailar', desc: 'Cumbia psicodélica y groove sin parar.', colors: ['#ffb84d', '#e0302f'], songIds: ['s7', 's8', 's2', 's9'] },
-  { id: 'e3', name: 'Folk de sala', desc: 'Acústico grabado en vivo, sin filtros.', colors: ['#c2ff3c', '#0fa968'], songIds: ['s3', 's4', 's2'] },
+  { id: 'e3', name: 'Folk de sala', desc: 'Acústico grabado en vivo, sin filtros.', colors: ['#c8ff3d', '#12c28a'], songIds: ['s3', 's4', 's2'] },
   { id: 'e4', name: 'Ruido pesado', desc: 'Compases impares y mucha distorsión.', colors: ['#9aa0ff', '#2b1d4d'], songIds: ['s11', 's12', 's6', 's1'] },
   { id: 'e5', name: 'Grabado en GrooveSpace', desc: 'Todo el catálogo, de punta a punta.', colors: ['#4db8ff', '#1b2a8a'], songIds: SONGS.map((x) => x.id) },
+  { id: 'e7', name: 'Clásicos de referencia', desc: 'Contenido de prueba: audio y video oficial.', colors: ['#fde047', '#dc2626'], songIds: ['y7', 'y8', 'y9', 'y1', 'y2', 'y5'] },
   { id: 'e6', name: 'Electrónica y cumbia', desc: 'Sintetizadores que no se quedan quietos.', colors: ['#b28aff', '#2cd5c4'], songIds: ['s7', 's8', 's9', 's10'] },
 ];
 export const playlistById = (id) => PLAYLISTS.find((p) => p.id === id);
 
-export const GENRES = ['Todo', 'Rock alternativo', 'Folk / Indie', 'Post-punk', 'Cumbia psicodélica', 'Electrónica', 'Metal progresivo'];
+export const GENRES = ['Todo', 'Rock alternativo', 'Folk / Indie', 'Post-punk', 'Cumbia psicodélica', 'Electrónica', 'Metal progresivo', 'Rock clásico', 'Grunge', 'Pop / Rock'];
 
 export const bandById = (id) => BANDS.find((b) => b.id === id);
 export const songById = (id) => SONGS.find((s) => s.id === id);

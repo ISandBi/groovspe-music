@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import { Linking } from 'react-native';
 import { SONGS, RULES, songById, bandById, playlistById } from './data';
 import { reportValidPlay } from './lib/api';
 import { LOCK_SCREEN } from './lib/config';
@@ -30,9 +31,14 @@ export function AppProvider({ children }) {
   const [repeat, setRepeat] = useState('off'); // off | all | one
   const [adGate, setAdGate] = useState(0);
   const [sheetSong, setSheetSong] = useState(null);
+  const [videoMode, setVideoMode] = useState(false);
+  const [videoRect, setVideoRect] = useState(null);
+  const [ytId, setYtId] = useState(null);
+  const [ytStatus, setYtStatus] = useState({ playing: false, currentTime: 0, duration: 0, didJustFinish: false, error: null });
+  const ytRef = useRef(null);
 
   const player = useAudioPlayer(null);
-  const status = useAudioPlayerStatus(player);
+  const audioStatus = useAudioPlayerStatus(player);
   const loaded = useRef(null);
 
   useEffect(() => {
@@ -57,6 +63,18 @@ export function AppProvider({ children }) {
 
   const showToast = useCallback((msg) => setToast({ msg, id: Date.now() }), []);
   const current = currentId ? songById(currentId) : null;
+  const isYt = !!current?.yt;
+  const status = isYt ? ytStatus : audioStatus;
+  const ytCmd = useCallback((c, v = 0) => { ytRef.current?.injectJavaScript(`window.cmd(${JSON.stringify(c)},${Number(v)});true;`); }, []);
+
+  // Mensajes del reproductor de YouTube -> estado unificado.
+  const onYtMessage = useCallback((e) => {
+    let m; try { m = JSON.parse(e.nativeEvent.data); } catch (err) { return; }
+    if (m.t === 'time') setYtStatus((s) => (Math.abs(s.currentTime - m.c) < 0.2 && s.duration === (m.d || s.duration) ? s : { ...s, currentTime: m.c || 0, duration: m.d || s.duration }));
+    else if (m.t === 'state') setYtStatus((s) => ({ ...s, playing: m.s === 1 || m.s === 3, didJustFinish: m.s === 0, error: m.s === 1 ? null : s.error, ...(m.s === -1 || m.s === 3 ? { didJustFinish: false } : {}) }));
+    else if (m.t === 'error') setYtStatus((s) => ({ ...s, playing: false, error: m.c }));
+  }, []);
+
   const band = current ? bandById(current.bandId) : null;
   const isBand = user?.role === 'band';
 
@@ -68,19 +86,28 @@ export function AppProvider({ children }) {
     tap();
     setCurrentId(songId);
     setRecent((r) => [songId, ...r.filter((x) => x !== songId)].slice(0, 20));
+    if (song.yt) {
+      try { player.pause(); } catch (e) {}
+      loaded.current = null;
+      setYtStatus({ playing: false, currentTime: 0, duration: song.duration, didJustFinish: false, error: null });
+      if (ytId === song.yt) { ytCmd('seek', 0); ytCmd('play'); } else setYtId(song.yt);
+      return;
+    }
+    ytCmd('pause'); setVideoMode(false);
     if (loaded.current !== songId) {
       player.replace({ uri: song.url });
       loaded.current = songId;
       if (LOCK_SCREEN) try { player.setActiveForLockScreen(true, { title: song.title, artist: bandById(song.bandId).name, albumTitle: 'GrooveSpace Music' }); } catch (e) {}
     } else { try { player.seekTo(0); } catch (e) {} }
     player.play();
-  }, [player]);
+  }, [player, ytId, ytCmd]);
 
   const toggle = useCallback(() => {
     if (!current) return;
     Haptics.selectionAsync().catch(() => {});
+    if (isYt) { ytCmd(status.playing ? 'pause' : 'play'); return; }
     if (status.playing) player.pause(); else player.play();
-  }, [current, status.playing, player]);
+  }, [current, isYt, status.playing, player, ytCmd]);
 
   const step = useCallback((dir, auto = false) => {
     if (!current || !queue.length) return;
@@ -94,7 +121,12 @@ export function AppProvider({ children }) {
     play(queue[(ni + queue.length) % queue.length]);
   }, [current, queue, shuffle, repeat, play, player]);
 
-  const seek = useCallback((sec) => { try { player.seekTo(sec); } catch (e) {} }, [player]);
+  const seek = useCallback((sec) => { if (isYt) return ytCmd('seek', sec); try { player.seekTo(sec); } catch (e) {} }, [player, isYt, ytCmd]);
+  const setMode = useCallback((m) => {
+    if (m === 'video' && !isYt) { showToast('Esta canción no tiene video'); return; }
+    tap(); setVideoMode(m === 'video');
+  }, [isYt, showToast]);
+  const openOnYoutube = useCallback(() => { if (current?.yt) Linking.openURL(`https://www.youtube.com/watch?v=${current.yt}`); }, [current]);
   const cycleRepeat = useCallback(() => { tap(); setRepeat((r) => (r === 'off' ? 'all' : r === 'all' ? 'one' : 'off')); }, []);
   const toggleShuffle = useCallback(() => { tap(); setShuffle((v) => !v); }, []);
 
@@ -111,12 +143,12 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!status.didJustFinish) return;
     setAdGate((n) => n + 1);
-    if (repeat === 'one') { try { player.seekTo(0); player.play(); } catch (e) {} } else step(1, true);
+    if (repeat === 'one') { if (isYt) { ytCmd('seek', 0); ytCmd('play'); } else { try { player.seekTo(0); player.play(); } catch (e) {} } } else step(1, true);
   }, [status.didJustFinish]); // eslint-disable-line
 
   // Reproducción válida: sesión iniciada, >= 30 s, una pagada por canción y día.
   useEffect(() => {
-    if (!current || !user || isBand || !status.playing) return;
+    if (!current || !user || isBand || !status.playing || band?.provisional) return;
     if (status.currentTime < RULES.minSeconds) return;
     const k = `${current.id}|${today()}`;
     if (credited[k]) return;
@@ -134,7 +166,7 @@ export function AppProvider({ children }) {
   const toggleFollow = useCallback((id) => { tap(); setFollowed((f) => (f.includes(id) ? f.filter((x) => x !== id) : [id, ...f])); }, []);
 
   const createPlaylist = useCallback((name, songIds = []) => {
-    const colorsPool = [['#ff5d8f', '#6a2cff'], ['#c2ff3c', '#0fa968'], ['#4db8ff', '#1b2a8a'], ['#ffb84d', '#e0302f'], ['#b28aff', '#2cd5c4']];
+    const colorsPool = [['#ff4f8b', '#8b5cff'], ['#c8ff3d', '#12c28a'], ['#4db8ff', '#1b2a8a'], ['#ffb84d', '#e0302f'], ['#b28aff', '#2cd5c4']];
     const id = `u${Date.now()}`;
     setPlaylists((p) => [{ id, name: name.trim() || 'Mi lista', songIds, colors: colorsPool[p.length % colorsPool.length] }, ...p]);
     showToast('Lista creada');
@@ -154,8 +186,9 @@ export function AppProvider({ children }) {
     shuffle, repeat, toggleShuffle, cycleRepeat, enqueueNext,
     playlists, createPlaylist, addToPlaylist, removeFromPlaylist, deletePlaylist, getPlaylist,
     followed, toggleFollow, sheetSong, openSheet: setSheetSong, closeSheet: () => setSheetSong(null),
-    logout: () => { setUser(null); try { player.pause(); } catch (e) {} },
-  }), [ready, user, isBand, premium, favorites, recent, plays, current, band, status, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong]); // eslint-disable-line
+    logout: () => { setUser(null); try { player.pause(); } catch (e) {} ytCmd('pause'); },
+    isYt, videoMode, setMode, videoRect, setVideoRect, ytRef, ytId, onYtMessage, openOnYoutube,
+  }), [ready, user, isBand, premium, favorites, recent, plays, current, band, status, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, videoMode, videoRect, ytId]); // eslint-disable-line
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

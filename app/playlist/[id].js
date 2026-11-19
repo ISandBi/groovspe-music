@@ -20,7 +20,7 @@ export default function PlaylistScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const isFav = id === 'fav';
-  const pl = isFav ? { id: 'fav', name: 'Canciones que te gustan', desc: 'Tus favoritas de GrooveSpace.', colors: [colors.pink, '#6a2cff'], songIds: favorites } : getPlaylist(id);
+  const pl = isFav ? { id: 'fav', name: 'Canciones que te gustan', desc: 'Tus favoritas de GrooveSpace.', colors: [colors.pink, '#8b5cff'], songIds: favorites } : getPlaylist(id);
   if (!pl) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   const songs = pl.songIds.map(songById).filter(Boolean);
   const total = songs.reduce((n, x) => n + x.duration, 0);

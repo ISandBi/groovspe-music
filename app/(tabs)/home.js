@@ -28,7 +28,7 @@ export default function Home() {
   const top = [...SONGS].sort((a, b) => b.plays - a.plays);
   const fresh = [...SONGS].reverse().slice(0, 8);
   const quick = [
-    { id: 'fav', name: 'Canciones que te gustan', colors: [colors.pink, '#6a2cff'], icon: 'heart', go: () => router.push('/(tabs)/library') },
+    { id: 'fav', name: 'Canciones que te gustan', colors: [colors.pink, '#8b5cff'], icon: 'heart', go: () => router.push('/(tabs)/library') },
     ...playlists.slice(0, 1).map((l) => ({ ...l, go: () => router.push(`/playlist/${l.id}`) })),
     ...PLAYLISTS.slice(0, 5).map((l) => ({ ...l, go: () => router.push(`/playlist/${l.id}`) })),
   ].slice(0, 6);

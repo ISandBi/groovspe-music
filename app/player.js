@@ -13,24 +13,35 @@ import { clock } from '../src/lib/format';
 import { useApp } from '../src/store';
 
 export default function Player() {
-  const { current, band, status, toggle, step, seek, favorites, toggleFav, premium, adGate, user, isBand, shuffle, repeat, toggleShuffle, cycleRepeat, context, openSheet } = useApp();
+  const { current, band, status, toggle, step, seek, favorites, toggleFav, premium, adGate, user, isBand, shuffle, repeat, toggleShuffle, cycleRepeat, context, openSheet, isYt, videoMode, setMode, setVideoRect, openOnYoutube } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const scale = useRef(new Animated.Value(1)).current;
   const [w, setW] = useState(1);
-  const art = Math.min(width - 48, 360);
+  const artRef = useRef(null);
+  const art = Math.min(width - 48, 340);
 
   // La carátula "respira": grande al reproducir, más pequeña en pausa.
   useEffect(() => { Animated.spring(scale, { toValue: status.playing ? 1 : 0.86, useNativeDriver: true, bounciness: 8 }).start(); }, [status.playing]); // eslint-disable-line
   useEffect(() => { if (!current) router.back(); }, [current]); // eslint-disable-line
+  // Posiciona el video de YouTube sobre la carátula cuando el modo es "video".
+  useEffect(() => {
+    if (!videoMode || !isYt) { setVideoRect(null); return undefined; }
+    const t = setTimeout(() => artRef.current?.measureInWindow((x, y, wd, ht) => {
+      const h = Math.round((wd * 9) / 16);
+      setVideoRect({ x, y: y + (ht - h) / 2, w: wd, h });
+    }), 420);
+    return () => clearTimeout(t);
+  }, [videoMode, isYt, current?.id, width]); // eslint-disable-line
+  useEffect(() => () => setVideoRect(null), []); // eslint-disable-line
   if (!current) return null;
 
   const fav = favorites.includes(current.id);
   const dur = status.duration || current.duration;
   const pct = Math.min(1, (status.currentTime || 0) / dur);
   const valid = (status.currentTime || 0) >= 30;
-  const counts = user && !isBand;
+  const counts = user && !isBand && !band.provisional;
   const ad = ADS[adGate % ADS.length];
 
   return (
@@ -46,11 +57,32 @@ export default function Player() {
           <Press onPress={() => openSheet(current.id)} style={s.round} accessibilityLabel="Más opciones"><Ionicons name="ellipsis-horizontal" size={22} color="#fff" /></Press>
         </View>
 
-        <View style={{ alignItems: 'center', marginTop: 28 }}>
-          <Animated.View style={{ transform: [{ scale }] }}>
-            <Cover band={band} size={art} radius={14} seed={current.id} />
-          </Animated.View>
+        <View style={s.modes}>
+          {[['audio', 'musical-notes', 'Audio'], ['video', 'videocam', 'Video']].map(([m, icon, label]) => {
+            const on = (m === 'video') === videoMode;
+            const off = m === 'video' && !isYt;
+            return (
+              <Press key={m} onPress={() => setMode(m)} scale={0.95} style={[s.mode, on && s.modeOn, off && { opacity: 0.4 }]} accessibilityLabel={`Modo ${label}`}>
+                <Ionicons name={icon} size={15} color={on ? colors.onLime : '#fff'} />
+                <Text style={[s.modeTxt, on && { color: colors.onLime }]}>{label}</Text>
+              </Press>
+            );
+          })}
         </View>
+
+        <View style={{ alignItems: 'center', marginTop: 18 }}>
+          <View ref={artRef} collapsable={false} style={{ width: art, height: art, alignItems: 'center', justifyContent: 'center' }}>
+            <Animated.View style={{ transform: [{ scale: videoMode ? 1 : scale }], opacity: videoMode && isYt ? 0 : 1 }}>
+              <Cover band={band} size={art} radius={14} seed={current.id} />
+            </Animated.View>
+          </View>
+        </View>
+        {status.error ? (
+          <Pressable onPress={openOnYoutube} style={s.errBox}>
+            <Ionicons name="alert-circle" size={16} color={colors.amber} />
+            <Text style={s.errTxt}>YouTube no permite reproducir este video aquí. Toca para abrirlo en YouTube.</Text>
+          </Pressable>
+        ) : null}
 
         <View style={s.meta}>
           <View style={{ flex: 1 }}>
@@ -87,7 +119,7 @@ export default function Player() {
           <View style={[s.valid, valid && counts && { backgroundColor: colors.limeSoft }]}>
             <Ionicons name={valid && counts ? 'checkmark-circle' : 'time-outline'} size={15} color={valid && counts ? colors.lime : '#fff'} />
             <Text style={[s.validTxt, valid && counts && { color: colors.lime }]} numberOfLines={1}>
-              {isBand ? 'Cuenta de banda: no acredita reproducciones' : !user ? 'Inicia sesión para que cuente' : valid ? 'Reproducción válida acreditada' : `Válida en ${Math.max(0, 30 - Math.floor(status.currentTime || 0))} s`}
+              {band.provisional ? 'Contenido de prueba: no acredita saldo' : isBand ? 'Cuenta de banda: no acredita reproducciones' : !user ? 'Inicia sesión para que cuente' : valid ? 'Reproducción válida acreditada' : `Válida en ${Math.max(0, 30 - Math.floor(status.currentTime || 0))} s`}
             </Text>
           </View>
           <Press onPress={() => router.push('/queue')} scale={0.9} hitSlop={10} accessibilityLabel="Ver cola"><Ionicons name="list" size={26} color="#fff" /></Press>
@@ -99,6 +131,12 @@ export default function Player() {
   );
 }
 const s = StyleSheet.create({
+  modes: { flexDirection: 'row', alignSelf: 'center', marginTop: 14, padding: 3, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.3)' },
+  mode: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 18, paddingVertical: 8, borderRadius: 999 },
+  modeOn: { backgroundColor: colors.lime },
+  modeTxt: { color: '#fff', fontWeight: '800', fontSize: 13 },
+  errBox: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 10, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.35)' },
+  errTxt: { flex: 1, color: '#fff', fontSize: 12 },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   round: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   from: { color: 'rgba(255,255,255,0.75)', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },

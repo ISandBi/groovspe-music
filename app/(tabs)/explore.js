@@ -11,7 +11,7 @@ import SongRow from '../../src/components/SongRow';
 import { colors, type } from '../../src/theme';
 import { BANDS, GENRES, SONGS, bandById } from '../../src/data';
 
-const genreColors = (g) => BANDS.find((b) => b.genre === g)?.colors || [colors.pink, '#6a2cff'];
+const genreColors = (g) => BANDS.find((b) => b.genre === g)?.colors || [colors.pink, '#8b5cff'];
 
 export default function Search() {
   const [q, setQ] = useState('');

@@ -48,7 +48,7 @@ export default function Library() {
         {showLists && (
           <View style={{ marginTop: 12 }}>
             <Row onPress={() => router.push('/playlist/fav')} title="Canciones que te gustan" sub={`Lista · ${favorites.length} canciones`}
-              cover={<LinearGradient colors={[colors.pink, '#6a2cff']} style={s.heart}><Ionicons name="heart" size={26} color="#fff" /></LinearGradient>} />
+              cover={<LinearGradient colors={[colors.pink, '#8b5cff']} style={s.heart}><Ionicons name="heart" size={26} color="#fff" /></LinearGradient>} />
             {playlists.map((l) => <Row key={l.id} onPress={() => router.push(`/playlist/${l.id}`)} title={l.name} sub={`Lista · ${l.songIds.length} canciones`} cover={<Cover band={l} size={60} radius={8} />} />)}
             {PLAYLISTS.slice(0, 3).map((l) => <Row key={l.id} onPress={() => router.push(`/playlist/${l.id}`)} title={l.name} sub="Lista · GrooveSpace" cover={<Cover band={l} size={60} radius={8} seed={l.id} />} />)}
           </View>
