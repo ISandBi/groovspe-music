@@ -13,7 +13,12 @@ import AdCard from '../../src/components/AdCard';
 import Card from '../../src/components/Card';
 import Shelf from '../../src/components/Shelf';
 import { colors, type } from '../../src/theme';
-import { ADS, BANDS, PLAYLISTS, SONGS, bandById, songById } from '../../src/data';
+import { ADS, BANDS, PLAYLISTS as ALL_LISTS, SONGS, bandById, songById } from '../../src/data';
+
+// La lista de referencia (audio y video) va primero para que se vea de inmediato.
+const PLAYLISTS = [...ALL_LISTS].sort((a, b) => (b.id === 'e7') - (a.id === 'e7'));
+const REAL = SONGS.filter((x) => x.yt);
+const OWN = SONGS.filter((x) => !x.yt);
 import { useApp } from '../../src/store';
 
 const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'; };
@@ -26,7 +31,7 @@ export default function Home() {
   const [filter, setFilter] = useState('Todo');
   const tint = nowBand?.colors[0] || colors.pink;
   const top = [...SONGS].sort((a, b) => b.plays - a.plays);
-  const fresh = [...SONGS].reverse().slice(0, 8);
+  const fresh = [...OWN].reverse().slice(0, 8);
   const quick = [
     { id: 'fav', name: 'Canciones que te gustan', colors: [colors.pink, '#8b5cff'], icon: 'heart', go: () => router.push('/(tabs)/library') },
     ...playlists.slice(0, 1).map((l) => ({ ...l, go: () => router.push(`/playlist/${l.id}`) })),
@@ -78,7 +83,15 @@ export default function Home() {
         {filter !== 'Música' && (
           <Section title="Bandas populares">
             <Shelf>
-              {BANDS.map((b) => <Card key={b.id} item={b} round title={b.name} subtitle="Banda" onPress={() => router.push(`/band/${b.id}`)} />)}
+              {[...BANDS].sort((a, b) => b.listeners - a.listeners).map((b) => <Card key={b.id} item={b} round title={b.name} subtitle="Banda" onPress={() => router.push(`/band/${b.id}`)} />)}
+            </Shelf>
+          </Section>
+        )}
+
+        {filter !== 'Bandas' && (
+          <Section title="Con audio y video">
+            <Shelf>
+              {REAL.map((song) => <Card key={song.id} item={bandById(song.bandId)} title={song.title} subtitle={`${bandById(song.bandId).name} · Video`} seed={song.id} onPress={() => play(song.id, REAL.map((x) => x.id), 'Con audio y video')} />)}
             </Shelf>
           </Section>
         )}
