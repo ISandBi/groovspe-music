@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +19,7 @@ export default function MiniPlayer({ bottom }) {
   const pct = dur ? Math.min(1, (status.currentTime || 0) / dur) : 0;
   return (
     <Animated.View style={[s.wrap, { bottom, opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) }] }]}>
-      <Press onPress={() => router.push('/player')} scale={0.985} style={{ flex: 1 }} accessibilityLabel="Abrir reproductor">
+      <Pressable onPress={() => router.push('/player')} style={{ flex: 1 }} accessibilityLabel="Abrir reproductor">
         <LinearGradient colors={[band.colors[0] + 'dd', band.colors[1] + 'ee']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.card}>
           <Cover band={band} size={44} radius={8} seed={current.id} />
           <View style={{ flex: 1 }}>
@@ -34,7 +34,7 @@ export default function MiniPlayer({ bottom }) {
           </Press>
           <View style={s.track}><View style={[s.fill, { width: `${pct * 100}%` }]} /></View>
         </LinearGradient>
-      </Press>
+      </Pressable>
     </Animated.View>
   );
 }
