@@ -24,6 +24,7 @@
     "react": "19.3.0",
     "react-native": "latest",
     "react-native-safe-area-context": "latest",
-    "react-native-screens": "latest"
+    "react-native-screens": "latest",
+    "react-native-webview": "latest"
   }
 }

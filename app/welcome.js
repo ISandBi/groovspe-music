@@ -49,7 +49,7 @@ export default function Welcome() {
 
       <View style={[s.content, { paddingBottom: insets.bottom + 20 }]}>
         <FadeIn delay={100} style={s.brand}>
-          <LinearGradient colors={[colors.lime, '#0fa968']} style={s.logo}><Ionicons name="musical-notes" size={22} color={colors.onLime} /></LinearGradient>
+          <LinearGradient colors={[colors.lime, '#12c28a']} style={s.logo}><Ionicons name="musical-notes" size={22} color={colors.onLime} /></LinearGradient>
           <Text style={s.brandTxt}>GrooveSpace <Text style={{ color: colors.lime }}>Music</Text></Text>
         </FadeIn>
         <FadeIn delay={220}><Text style={s.title}>Música que{'\n'}nace en la sala.</Text></FadeIn>

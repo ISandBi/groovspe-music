@@ -1,18 +1,29 @@
-// Sistema de diseño GrooveSpace Music (misma paleta que la plataforma web).
+// Sistema de diseño GrooveSpace Music: superficies violeta profundo + acentos lima/rosa/violeta.
 export const colors = {
-  bg: '#100d17',
-  surface: '#1d1725',
-  raised: '#261e31',
-  line: 'rgba(255,248,255,0.10)',
-  lime: '#c2ff3c',
-  limeSoft: 'rgba(194,255,60,0.14)',
-  pink: '#ff5d8f',
-  violet: '#b28aff',
-  amber: '#ffb84d',
-  text: '#fff8ff',
-  body: '#e6deed',
-  muted: '#b1a4bd',
-  onLime: '#100d17',
+  bg: '#0c0914',
+  surface: '#161021',
+  raised: '#221a30',
+  line: 'rgba(255,255,255,0.08)',
+  lime: '#c8ff3d',
+  limeSoft: 'rgba(200,255,61,0.16)',
+  pink: '#ff4f8b',
+  violet: '#8b5cff',
+  cyan: '#2fd6c8',
+  amber: '#ffb347',
+  text: '#fdf7ff',
+  body: '#e4dbee',
+  muted: '#a99bbb',
+  onLime: '#0c0914',
+};
+
+// Degradados de marca (úsalos para cabeceras, tarjetas y anuncios).
+export const gradients = {
+  brand: ['#ff4f8b', '#8b5cff'],
+  lime: ['#c8ff3d', '#12c28a'],
+  sunset: ['#ffb347', '#ff4f8b'],
+  ocean: ['#38bdf8', '#4f46e5'],
+  aurora: ['#8b5cff', '#2fd6c8'],
+  night: ['#6366f1', '#1e1b4b'],
 };
 
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 };

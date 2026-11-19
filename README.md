@@ -8,6 +8,10 @@ Hecha con **React Native + Expo (Expo Router)**. Proyecto académico.
 
 Inicio con accesos rápidos y estanterías, buscador con tiles por género, biblioteca (listas propias, favoritas, bandas que sigues), listas editoriales de GrooveSpace, perfil de banda con *Seguir*, cola, aleatorio, repetir (todo/una), menú “⋯” por canción (favorita, añadir a lista, añadir a la cola), reproductor con fondo degradado según la banda y mini-reproductor. Interfaz separada para cuentas de banda.
 
+## Contenido provisional (audio y video)
+
+Las bandas marcadas como *referencia* (Café Tacvba, Zoé, Joy Division, Los Ángeles Azules, Daft Punk, Tool, Queen, Nirvana, Coldplay) se reproducen con el **reproductor oficial incrustado de YouTube**: no se descargan ni se alojan archivos. Sirven solo para probar el audio/video del reproductor (selector **Audio | Video**); **no acreditan saldo**. Algunos videos pueden bloquear la reproducción incrustada; en ese caso la app ofrece abrirlos en YouTube. Antes de publicar, sustituye este contenido por los masters grabados en GrooveSpace (`src/data.js`) o por material con licencia.
+
 ## Qué necesitas instalar
 
 1. **Node.js LTS** (https://nodejs.org) — incluye `npm`.

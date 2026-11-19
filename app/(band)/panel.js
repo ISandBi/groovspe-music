@@ -34,7 +34,7 @@ export default function BandPanel() {
       </FadeIn>
 
       <FadeIn delay={120}>
-        <LinearGradient colors={[colors.pink, '#6a2cff']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.hero}>
+        <LinearGradient colors={[colors.pink, '#8b5cff']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.hero}>
           <Text style={s.heroTag}>TUS REPRODUCCIONES VÁLIDAS</Text>
           <Text style={s.heroNum}>${plays}</Text>
           <Text style={s.heroTxt}>MXN de saldo acumulado en esta sesión · el saldo se usa en salas, equipo e ingenieros</Text>
