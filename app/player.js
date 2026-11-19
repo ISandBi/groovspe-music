@@ -80,7 +80,7 @@ export default function Player() {
         {status.error ? (
           <Pressable onPress={openOnYoutube} style={s.errBox}>
             <Ionicons name="alert-circle" size={16} color={colors.amber} />
-            <Text style={s.errTxt}>YouTube no permite reproducir este video aquí. Toca para abrirlo en YouTube.</Text>
+            <Text style={s.errTxt}>YouTube no pudo reproducir este video (código {status.error}). Toca para abrirlo en YouTube.</Text>
           </Pressable>
         ) : null}
 

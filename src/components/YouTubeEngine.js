@@ -12,7 +12,7 @@ var player,ready=false,pending=null;
 function post(o){window.ReactNativeWebView.postMessage(JSON.stringify(o))}
 var tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
 function onYouTubeIframeAPIReady(){
-  player=new YT.Player('p',{width:'100%',height:'100%',playerVars:{playsinline:1,controls:0,rel:0,modestbranding:1,fs:0,disablekb:1,iv_load_policy:3},
+  player=new YT.Player('p',{width:'100%',height:'100%',playerVars:{origin:'https://music.groovespace.example',playsinline:1,controls:0,rel:0,modestbranding:1,fs:0,disablekb:1,iv_load_policy:3},
     events:{
       onReady:function(){ready=true;post({t:'ready'});if(pending){player.loadVideoById(pending);pending=null}},
       onStateChange:function(e){post({t:'state',s:e.data})},
@@ -41,7 +41,7 @@ export default function YouTubeEngine() {
     <View pointerEvents={visible ? 'none' : 'none'} style={[s.box, box]}>
       <WebView
         ref={ytRef}
-        source={{ html: HTML, baseUrl: 'https://www.youtube.com' }}
+        source={{ html: HTML, baseUrl: 'https://music.groovespace.example' }}
         originWhitelist={['*']}
         javaScriptEnabled
         allowsInlineMediaPlayback
