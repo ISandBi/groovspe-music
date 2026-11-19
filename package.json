@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "latest",
-    "@react-native-async-storage/async-storage": "latest",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "latest",
     "expo-audio": "latest",
     "expo-constants": "latest",
@@ -21,7 +21,7 @@
     "expo-linking": "latest",
     "expo-router": "latest",
     "expo-status-bar": "latest",
-    "react": "latest",
+    "react": "19.3.0",
     "react-native": "latest",
     "react-native-safe-area-context": "latest",
     "react-native-screens": "latest"
