@@ -5,8 +5,8 @@
     "scheme": "groovespacemusic",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#100d17",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#ffffff",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,

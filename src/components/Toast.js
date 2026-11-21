@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
 import { useApp } from '../store';
 
-// Aviso flotante cuando una reproducción válida acredita saldo a la banda.
+// Aviso flotante oscuro (pill) para confirmaciones y reproducciones válidas.
 export default function Toast() {
   const { toast } = useApp();
   const insets = useSafeAreaInsets();
@@ -13,7 +13,7 @@ export default function Toast() {
   useEffect(() => {
     if (!toast) return;
     Animated.sequence([
-      Animated.spring(v, { toValue: 1, useNativeDriver: true, bounciness: 10 }),
+      Animated.spring(v, { toValue: 1, useNativeDriver: true, bounciness: 8 }),
       Animated.delay(2200),
       Animated.timing(v, { toValue: 0, duration: 250, useNativeDriver: true }),
     ]).start();
@@ -21,12 +21,12 @@ export default function Toast() {
   if (!toast) return null;
   return (
     <Animated.View pointerEvents="none" style={[s.wrap, { top: insets.top + 8, opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [-30, 0] }) }] }]}>
-      <Ionicons name="sparkles" size={16} color={colors.onLime} />
+      <Ionicons name="checkmark-circle" size={18} color={colors.accent} />
       <Text style={s.txt}>{toast.msg}</Text>
     </Animated.View>
   );
 }
 const s = StyleSheet.create({
-  wrap: { position: 'absolute', alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.lime, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999, zIndex: 50 },
-  txt: { color: colors.onLime, fontWeight: '800', fontSize: 13 },
+  wrap: { position: 'absolute', alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(26,19,37,0.94)', paddingHorizontal: 16, paddingVertical: 11, borderRadius: 999, zIndex: 50 },
+  txt: { color: '#fff', fontWeight: '600', fontSize: 14 },
 });

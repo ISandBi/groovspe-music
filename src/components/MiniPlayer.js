@@ -1,50 +1,55 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
 import Cover from './Cover';
 import { colors, MINI_HEIGHT } from '../theme';
 import { useApp } from '../store';
 
-// Barra inferior "reproduciendo ahora". Al tocarla se abre el reproductor completo.
+// Barra "reproduciendo ahora" con efecto cristal sobre la barra de pestañas. Al tocarla se abre el reproductor.
 export default function MiniPlayer({ bottom }) {
-  const { current, band, status, toggle, isYt, videoMode } = useApp();
+  const { current, band, status, toggle, step, isYt, videoMode } = useApp();
   const router = useRouter();
   const v = useRef(new Animated.Value(0)).current;
-  useEffect(() => { Animated.spring(v, { toValue: current ? 1 : 0, useNativeDriver: true, bounciness: 8 }).start(); }, [!!current]); // eslint-disable-line
+  useEffect(() => { Animated.spring(v, { toValue: current ? 1 : 0, useNativeDriver: true, bounciness: 6 }).start(); }, [!!current]); // eslint-disable-line
   if (!current) return null;
   const dur = status.duration || current.duration;
   const pct = dur ? Math.min(1, (status.currentTime || 0) / dur) : 0;
   return (
-    <Animated.View style={[s.wrap, { bottom, opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) }] }]}>
-      <Pressable onPress={() => router.push('/player')} style={{ flex: 1 }} accessibilityLabel="Abrir reproductor">
-        <LinearGradient colors={[band.colors[0] + 'dd', band.colors[1] + 'ee']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.card}>
-          <Cover band={band} size={44} radius={8} seed={current.id} />
+    <Animated.View style={[s.wrap, { bottom, opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }] }]}>
+      <BlurView tint="light" intensity={90} style={s.blur}>
+        <View style={s.tint} />
+        <Pressable onPress={() => router.push('/player')} style={s.row} accessibilityLabel="Abrir reproductor">
+          <Cover band={band} size={42} radius={6} seed={current.id} />
           <View style={{ flex: 1 }}>
             <Text numberOfLines={1} style={s.title}>{current.title}</Text>
             <View style={s.sub}>
-              <Ionicons name={isYt && videoMode ? 'videocam' : 'musical-notes'} size={12} color="rgba(255,255,255,0.85)" />
+              {isYt && <Ionicons name={videoMode ? 'videocam' : 'musical-notes'} size={11} color={colors.muted} />}
               <Text numberOfLines={1} style={s.band}>{band.name}</Text>
             </View>
           </View>
-          <Press onPress={toggle} scale={0.88} style={s.play} accessibilityLabel={status.playing ? 'Pausar' : 'Reproducir'}>
-            <Ionicons name={status.playing ? 'pause' : 'play'} size={22} color={colors.onLime} style={!status.playing && { marginLeft: 2 }} />
+          <Press onPress={toggle} scale={0.85} hitSlop={8} accessibilityLabel={status.playing ? 'Pausar' : 'Reproducir'}>
+            <Ionicons name={status.playing ? 'pause' : 'play'} size={26} color={colors.text} />
           </Press>
-          <View style={s.track}><View style={[s.fill, { width: `${pct * 100}%` }]} /></View>
-        </LinearGradient>
-      </Pressable>
+          <Press onPress={() => step(1)} scale={0.85} hitSlop={8} accessibilityLabel="Siguiente">
+            <Ionicons name="play-forward" size={26} color={colors.text} />
+          </Press>
+        </Pressable>
+        <View style={s.track}><View style={[s.fill, { width: `${pct * 100}%` }]} /></View>
+      </BlurView>
     </Animated.View>
   );
 }
 const s = StyleSheet.create({
-  wrap: { position: 'absolute', left: 8, right: 8, height: MINI_HEIGHT, zIndex: 20 },
-  card: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 14, paddingHorizontal: 10, overflow: 'hidden' },
-  title: { color: '#fff', fontSize: 15, fontWeight: '800' },
-  sub: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  band: { color: 'rgba(255,255,255,0.88)', fontSize: 13, flexShrink: 1 },
-  play: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.lime, alignItems: 'center', justifyContent: 'center' },
-  track: { position: 'absolute', left: 10, right: 10, bottom: 3, height: 2, borderRadius: 1, backgroundColor: 'rgba(255,255,255,0.25)' },
-  fill: { height: 2, borderRadius: 1, backgroundColor: '#fff' },
+  wrap: { position: 'absolute', left: 8, right: 8, height: MINI_HEIGHT, zIndex: 20, borderRadius: 14, shadowColor: '#1a1325', shadowOpacity: 0.16, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6 },
+  blur: { flex: 1, borderRadius: 14, overflow: 'hidden' },
+  tint: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(250,248,253,0.82)' },
+  row: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 8 },
+  title: { fontSize: 15, fontWeight: '600', color: colors.text },
+  sub: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  band: { fontSize: 13, color: colors.muted, flexShrink: 1 },
+  track: { position: 'absolute', left: 8, right: 8, bottom: 0, height: 2, backgroundColor: 'rgba(26,19,37,0.08)' },
+  fill: { height: 2, backgroundColor: colors.accent },
 });

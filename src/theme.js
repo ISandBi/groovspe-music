@@ -1,25 +1,28 @@
-// Sistema de diseño GrooveSpace Music: superficies violeta profundo + acentos lima/rosa/violeta.
+// GrooveSpace Music · diseño claro y limpio (estilo reproductor de Apple) con la paleta de GrooveSpace.
+// Rosa = acento principal (como el rojo de Apple Music); violeta e índigo para profundidad; verde solo para "válido".
 export const colors = {
-  bg: '#0c0914',
-  surface: '#161021',
-  raised: '#221a30',
-  line: 'rgba(255,255,255,0.08)',
-  lime: '#c8ff3d',
-  limeSoft: 'rgba(200,255,61,0.16)',
-  pink: '#ff4f8b',
-  violet: '#8b5cff',
-  cyan: '#2fd6c8',
-  amber: '#ffb347',
-  text: '#fdf7ff',
-  body: '#e4dbee',
-  muted: '#a99bbb',
-  onLime: '#0c0914',
+  bg: '#ffffff',
+  surface: '#f4f2f8',      // campos, tarjetas suaves, listas agrupadas
+  raised: '#ffffff',
+  line: 'rgba(26,19,37,0.12)',
+  text: '#1a1325',
+  body: '#463d52',
+  muted: '#7d7589',
+  accent: '#f0457f',
+  accentSoft: 'rgba(240,69,127,0.10)',
+  violet: '#7c4dff',
+  green: '#0fa37a',
+  amber: '#f59e0b',
+  cyan: '#0ea5a4',
+  onAccent: '#ffffff',
+  // Alias para componentes antiguos
+  lime: '#f0457f', limeSoft: 'rgba(240,69,127,0.10)', pink: '#f0457f', onLime: '#ffffff',
 };
 
-// Degradados de marca (úsalos para cabeceras, tarjetas y anuncios).
+// Degradados de marca (portadas, categorías, cabeceras).
 export const gradients = {
   brand: ['#ff4f8b', '#8b5cff'],
-  lime: ['#c8ff3d', '#12c28a'],
+  lime: ['#5fd6a4', '#0f8f6b'],
   sunset: ['#ffb347', '#ff4f8b'],
   ocean: ['#38bdf8', '#4f46e5'],
   aurora: ['#8b5cff', '#2fd6c8'],
@@ -27,17 +30,19 @@ export const gradients = {
 };
 
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 };
-export const radius = { sm: 10, md: 16, lg: 24, pill: 999 };
+export const radius = { sm: 6, md: 10, lg: 14, xl: 20, pill: 999 };
 
 export const type = {
-  display: { fontSize: 34, fontWeight: '800', letterSpacing: -1, color: colors.text },
+  largeTitle: { fontSize: 34, fontWeight: '800', letterSpacing: -0.8, color: colors.text },
+  display: { fontSize: 34, fontWeight: '800', letterSpacing: -0.8, color: colors.text },
   h1: { fontSize: 28, fontWeight: '800', letterSpacing: -0.6, color: colors.text },
-  h2: { fontSize: 20, fontWeight: '700', letterSpacing: -0.3, color: colors.text },
-  h3: { fontSize: 16, fontWeight: '700', color: colors.text },
+  h2: { fontSize: 22, fontWeight: '700', letterSpacing: -0.4, color: colors.text },
+  h3: { fontSize: 16, fontWeight: '600', color: colors.text },
   body: { fontSize: 15, lineHeight: 22, color: colors.body },
   small: { fontSize: 13, color: colors.muted },
-  label: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: colors.muted },
+  label: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', color: colors.muted },
 };
 
-export const TAB_HEIGHT = 62;
-export const MINI_HEIGHT = 64;
+export const TAB_HEIGHT = 52;
+export const MINI_HEIGHT = 58;
+export const shadow = { shadowColor: '#1a1325', shadowOpacity: 0.22, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 };

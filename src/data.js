@@ -1,6 +1,6 @@
 // Datos de demostración. Sustituir por la API de GrooveSpace (ver src/lib/api.js).
 const SAMPLE = (n) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`;
-const G = { brand: ['#ff4f8b', '#8b5cff'], lime: ['#c8ff3d', '#12c28a'], sunset: ['#ffb347', '#ff4f8b'], ocean: ['#38bdf8', '#4f46e5'], aurora: ['#8b5cff', '#2fd6c8'], night: ['#6366f1', '#1e1b4b'] };
+const G = { brand: ['#ff4f8b', '#8b5cff'], lime: ['#5fd6a4', '#0f8f6b'], sunset: ['#ffb347', '#ff4f8b'], ocean: ['#38bdf8', '#4f46e5'], aurora: ['#8b5cff', '#2fd6c8'], night: ['#6366f1', '#1e1b4b'] };
 
 export const BANDS = [
   // Bandas de GrooveSpace (grabadas por ingenieros de la plataforma).

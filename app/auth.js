@@ -45,19 +45,21 @@ export default function Auth() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={{ padding: 24, paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }} keyboardShouldPersistTaps="handled">
-        <Press onPress={() => router.back()} style={s.back} accessibilityLabel="Volver"><Ionicons name="chevron-back" size={22} color={colors.text} /></Press>
+        <Press onPress={() => router.back()} style={s.back} accessibilityLabel="Volver"><Ionicons name="chevron-back" size={24} color={colors.accent} /><Text style={{ color: colors.accent, fontSize: 17 }}>Atrás</Text></Press>
         <FadeIn><Text style={[type.h1, { marginTop: 24 }]}>{reg ? 'Crea tu cuenta de oyente' : 'Bienvenido de vuelta'}</Text></FadeIn>
         <FadeIn delay={100}><Text style={[type.body, { marginTop: 8 }]}>{reg ? 'Registrarte hace que tus reproducciones válidas cuenten para las bandas. Si tu banda ya está en GrooveSpace, usa su mismo correo y contraseña.' : 'Entra con tu cuenta de GrooveSpace. Si eres banda, verás tu panel de banda.'}</Text></FadeIn>
         <FadeIn delay={200} style={{ marginTop: 28, gap: 14 }}>
-          {reg && <Field label="Nombre" value={name} onChangeText={setName} placeholder="Tu nombre" autoCapitalize="words" />}
-          <Field label="Correo" value={email} onChangeText={setEmail} placeholder="tu@correo.com" keyboardType="email-address" autoCapitalize="none" />
-          <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder="Mínimo 6 caracteres" secureTextEntry />
-          {!!error && <Text style={{ color: colors.pink, fontWeight: '600' }}>{error}</Text>}
+          <View style={s.group}>
+            {reg && <Field label="Nombre" value={name} onChangeText={setName} placeholder="Nombre" autoCapitalize="words" />}
+            <Field label="Correo" value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" autoCapitalize="none" />
+            <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder="Contraseña (mínimo 6)" secureTextEntry last />
+          </View>
+          {!!error && <Text style={{ color: colors.accent, fontWeight: '600' }}>{error}</Text>}
           <Press onPress={busy ? undefined : submit} style={[s.primary, busy && { opacity: 0.7 }]}>
-            {busy ? <ActivityIndicator color={colors.onLime} /> : <Text style={s.primaryTxt}>{reg ? 'Registrarme' : 'Entrar'}</Text>}
+            {busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryTxt}>{reg ? 'Registrarme' : 'Entrar'}</Text>}
           </Press>
           <Press onPress={() => { setError(''); setMode(reg ? 'login' : 'register'); }} style={{ alignItems: 'center', padding: 8 }}>
-            <Text style={{ color: colors.muted }}>{reg ? '¿Ya tienes cuenta? ' : '¿Aún no tienes cuenta? '}<Text style={{ color: colors.lime, fontWeight: '700' }}>{reg ? 'Entrar' : 'Registrarme'}</Text></Text>
+            <Text style={{ color: colors.muted }}>{reg ? '¿Ya tienes cuenta? ' : '¿Aún no tienes cuenta? '}<Text style={{ color: colors.accent, fontWeight: '600' }}>{reg ? 'Entrar' : 'Registrarme'}</Text></Text>
           </Press>
         </FadeIn>
         {reg && <Text style={[type.small, { marginTop: 20, textAlign: 'center' }]}>Al registrarte aceptas los Términos y el Aviso de Privacidad de GrooveSpace.</Text>}
@@ -65,19 +67,18 @@ export default function Auth() {
     </KeyboardAvoidingView>
   );
 }
-function Field({ label, ...p }) {
-  const [focus, setFocus] = useState(false);
+function Field({ label, last, ...p }) {
   return (
-    <View>
-      <Text style={[type.label, { marginBottom: 6 }]}>{label}</Text>
-      <TextInput {...p} placeholderTextColor={colors.muted} onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
-        style={[s.input, focus && { borderColor: colors.lime }]} />
+    <View style={[s.field, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }]}>
+      <TextInput {...p} accessibilityLabel={label} placeholderTextColor={colors.muted} style={s.input} />
     </View>
   );
 }
 const s = StyleSheet.create({
-  back: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
-  input: { backgroundColor: colors.surface, color: colors.text, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, borderWidth: 1.5, borderColor: colors.line },
-  primary: { backgroundColor: colors.lime, borderRadius: 999, paddingVertical: 16, alignItems: 'center', marginTop: 6 },
-  primaryTxt: { color: colors.onLime, fontWeight: '800', fontSize: 16 },
+  back: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start' },
+  group: { backgroundColor: colors.surface, borderRadius: 12, overflow: 'hidden' },
+  field: { paddingHorizontal: 16 },
+  input: { color: colors.text, fontSize: 17, paddingVertical: 14 },
+  primary: { backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 6 },
+  primaryTxt: { color: '#fff', fontWeight: '700', fontSize: 17 },
 });

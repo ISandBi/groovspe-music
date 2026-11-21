@@ -1,70 +1,90 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Cover from '../../src/components/Cover';
 import Press from '../../src/components/Press';
 import FadeIn from '../../src/components/FadeIn';
+import Header from '../../src/components/Header';
+import SongRow from '../../src/components/SongRow';
 import { colors, type } from '../../src/theme';
-import { PLAYLISTS as ALL_LISTS, BANDS, bandById } from '../../src/data';
-
-// Lista de referencia (audio y video) primero.
-const PLAYLISTS = [...ALL_LISTS].sort((a, b) => (b.id === 'e7') - (a.id === 'e7'));
-const SUGGESTED = [...BANDS].sort((a, b) => b.listeners - a.listeners).slice(0, 6);
+import { PLAYLISTS as ALL_LISTS, BANDS, SONGS, bandById, songById } from '../../src/data';
 import { useApp } from '../../src/store';
 
-const FILTERS = ['Todo', 'Listas', 'Bandas'];
+const PLAYLISTS = [...ALL_LISTS].sort((a, b) => (b.id === 'e7') - (a.id === 'e7'));
+const TOP = [...BANDS].sort((a, b) => b.listeners - a.listeners);
 
 export default function Library() {
-  const { favorites, playlists, followed, createPlaylist } = useApp();
+  const { favorites, playlists, followed, recent, createPlaylist } = useApp();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const [filter, setFilter] = useState('Todo');
+  const [view, setView] = useState(null); // null | listas | bandas | canciones
   const [asking, setAsking] = useState(false);
   const [name, setName] = useState('');
 
-  const Row = ({ cover, title, sub, onPress, round }) => (
-    <Press onPress={onPress} scale={0.985} style={s.row}>
+  const rows = [
+    ['listas', 'musical-notes-outline', 'Listas', playlists.length + PLAYLISTS.length],
+    ['bandas', 'people-outline', 'Bandas', followed.length || TOP.length],
+    ['canciones', 'musical-note-outline', 'Canciones', SONGS.length],
+  ];
+  const Row = ({ cover, title, sub, onPress }) => (
+    <Press onPress={onPress} scale={0.99} style={s.row}>
       {cover}
-      <View style={{ flex: 1 }}><Text style={type.h3} numberOfLines={1}>{title}</Text><Text style={type.small} numberOfLines={1}>{sub}</Text></View>
+      <View style={s.rowText}><View style={{ flex: 1 }}><Text style={type.h3} numberOfLines={1}>{title}</Text><Text style={type.small} numberOfLines={1}>{sub}</Text></View><Ionicons name="chevron-forward" size={18} color={colors.muted} /></View>
     </Press>
   );
-  const showLists = filter !== 'Bandas';
-  const showBands = filter !== 'Listas';
+  const heartCover = <View style={s.heart}><Ionicons name="heart" size={24} color="#fff" /></View>;
+  const grid = (recent.length ? recent.map(songById).map((x) => bandById(x.bandId)) : TOP).filter((b, i, a) => a.indexOf(b) === i).slice(0, 6);
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 170, paddingHorizontal: 20 }} showsVerticalScrollIndicator={false}>
-        <FadeIn style={s.head}>
-          <Text style={[type.h1, { flex: 1 }]}>Tu biblioteca</Text>
-          <Press onPress={() => setAsking(true)} scale={0.88} style={s.add} accessibilityLabel="Crear lista"><Ionicons name="add" size={24} color={colors.text} /></Press>
-        </FadeIn>
-        <View style={s.chips}>
-          {FILTERS.map((f) => (
-            <Press key={f} onPress={() => setFilter(f)} scale={0.94} style={[s.chip, filter === f && s.chipOn]}>
-              <Text style={[s.chipTxt, filter === f && { color: colors.onLime }]}>{f}</Text>
-            </Press>
-          ))}
-        </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 190 }} showsVerticalScrollIndicator={false}>
+        {view ? (
+          <View style={{ paddingTop: 54 }}>
+            <Press onPress={() => setView(null)} style={s.back}><Ionicons name="chevron-back" size={22} color={colors.accent} /><Text style={{ color: colors.accent, fontSize: 17 }}>Biblioteca</Text></Press>
+            <Header title={rows.find((r) => r[0] === view)[2]} />
+          </View>
+        ) : (
+          <Header title="Biblioteca" right={<Press onPress={() => setAsking(true)} hitSlop={10} accessibilityLabel="Crear lista"><Text style={s.edit}>Nueva lista</Text></Press>} />
+        )}
 
-        {showLists && (
-          <View style={{ marginTop: 12 }}>
-            <Row onPress={() => router.push('/playlist/fav')} title="Canciones que te gustan" sub={`Lista · ${favorites.length} canciones`}
-              cover={<LinearGradient colors={[colors.pink, '#8b5cff']} style={s.heart}><Ionicons name="heart" size={26} color="#fff" /></LinearGradient>} />
-            {playlists.map((l) => <Row key={l.id} onPress={() => router.push(`/playlist/${l.id}`)} title={l.name} sub={`Lista · ${l.songIds.length} canciones`} cover={<Cover band={l} size={60} radius={8} />} />)}
-            {PLAYLISTS.slice(0, 4).map((l) => <Row key={l.id} onPress={() => router.push(`/playlist/${l.id}`)} title={l.name} sub="Lista · GrooveSpace" cover={<Cover band={l} size={60} radius={8} seed={l.id} />} />)}
+        {!view && (
+          <FadeIn>
+            <Press onPress={() => router.push('/playlist/fav')} scale={0.99} style={[s.rowPlain, { marginTop: 4 }]}>
+              <View style={s.favIcon}><Ionicons name="heart" size={18} color={colors.accent} /></View>
+              <View style={s.rowText}><Text style={[type.h3, { flex: 1, fontWeight: '400', fontSize: 20 }]}>Favoritas</Text><Text style={type.small}>{favorites.length}</Text><Ionicons name="chevron-forward" size={18} color={colors.muted} /></View>
+            </Press>
+            {rows.map(([k, icon, label, n]) => (
+              <Press key={k} onPress={() => setView(k)} scale={0.99} style={s.rowPlain}>
+                <View style={s.favIcon}><Ionicons name={icon} size={18} color={colors.accent} /></View>
+                <View style={s.rowText}><Text style={[type.h3, { flex: 1, fontWeight: '400', fontSize: 20 }]}>{label}</Text><Text style={type.small}>{n}</Text><Ionicons name="chevron-forward" size={18} color={colors.muted} /></View>
+              </Press>
+            ))}
+            <Text style={[type.h2, { paddingHorizontal: 20, marginTop: 26, marginBottom: 12 }]}>Agregado recientemente</Text>
+            <View style={s.grid}>
+              {grid.map((b) => (
+                <Press key={b.id} onPress={() => router.push(`/band/${b.id}`)} style={{ width: '47.5%' }}>
+                  <Cover band={b} size={150} radius={10} elevated style={{ width: '100%', height: undefined, aspectRatio: 1 }} />
+                  <Text style={s.gTitle} numberOfLines={1}>{b.name}</Text><Text style={type.small}>{b.genre}</Text>
+                </Press>
+              ))}
+            </View>
+          </FadeIn>
+        )}
+
+        {view === 'listas' && (
+          <View>
+            <Row onPress={() => router.push('/playlist/fav')} title="Favoritas" sub={`${favorites.length} canciones`} cover={heartCover} />
+            {playlists.map((l) => <Row key={l.id} onPress={() => router.push(`/playlist/${l.id}`)} title={l.name} sub={`${l.songIds.length} canciones`} cover={<Cover band={l} size={56} radius={6} />} />)}
+            {PLAYLISTS.map((l) => <Row key={l.id} onPress={() => router.push(`/playlist/${l.id}`)} title={l.name} sub="GrooveSpace" cover={<Cover band={l} size={56} radius={6} seed={l.id} />} />)}
           </View>
         )}
-        {showBands && (
-          <View style={{ marginTop: 12 }}>
-            {followed.map((id) => { const b = bandById(id); return <Row key={id} onPress={() => router.push(`/band/${id}`)} title={b.name} sub="Banda · Siguiendo" cover={<Cover band={b} size={60} radius={30} />} />; })}
-            <Text style={[type.h2, { marginTop: 18, marginBottom: 6 }]}>{followed.length ? 'Descubre más bandas' : 'Bandas para seguir'}</Text>
-            {SUGGESTED.filter((b) => !followed.includes(b.id)).map((b) => (
-              <Row key={b.id} onPress={() => router.push(`/band/${b.id}`)} title={b.name} sub={b.provisional ? `${b.genre} · Audio y video` : b.genre} cover={<Cover band={b} size={60} radius={30} />} />
-            ))}
+        {view === 'bandas' && (
+          <View>
+            {(followed.length ? followed.map(bandById) : TOP).map((b) => <Row key={b.id} onPress={() => router.push(`/band/${b.id}`)} title={b.name} sub={followed.includes(b.id) ? 'Siguiendo' : b.genre} cover={<Cover band={b} size={56} radius={28} />} />)}
           </View>
+        )}
+        {view === 'canciones' && (
+          <View style={{ paddingHorizontal: 20 }}>{SONGS.map((song) => <SongRow key={song.id} song={song} list={SONGS.map((x) => x.id)} context="Canciones" />)}</View>
         )}
       </ScrollView>
 
@@ -73,24 +93,28 @@ export default function Library() {
         <View style={s.dialog}>
           <Text style={type.h2}>Nueva lista</Text>
           <TextInput autoFocus value={name} onChangeText={setName} placeholder="Ponle nombre" placeholderTextColor={colors.muted} style={s.input} />
-          <Press onPress={() => { const id = createPlaylist(name); setName(''); setAsking(false); router.push(`/playlist/${id}`); }} style={s.primary}><Text style={s.primaryTxt}>Crear</Text></Press>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <Press onPress={() => setAsking(false)} style={[s.btn, { backgroundColor: colors.surface, flex: 1 }]}><Text style={[s.btnTxt, { color: colors.text }]}>Cancelar</Text></Press>
+            <Press onPress={() => { const id = createPlaylist(name); setName(''); setAsking(false); router.push(`/playlist/${id}`); }} style={[s.btn, { flex: 1 }]}><Text style={s.btnTxt}>Crear</Text></Press>
+          </View>
         </View>
       </Modal>
     </View>
   );
 }
 const s = StyleSheet.create({
-  head: { flexDirection: 'row', alignItems: 'center' },
-  add: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
-  chips: { flexDirection: 'row', gap: 8, marginTop: 16 },
-  chip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999, backgroundColor: colors.surface },
-  chipOn: { backgroundColor: colors.lime },
-  chipTxt: { color: colors.text, fontWeight: '700', fontSize: 13 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 8 },
-  heart: { width: 60, height: 60, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.7)' },
-  dialog: { position: 'absolute', left: 24, right: 24, top: '30%', backgroundColor: colors.raised, borderRadius: 24, padding: 22, gap: 14 },
-  input: { backgroundColor: colors.surface, color: colors.text, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, fontSize: 16, borderWidth: 1.5, borderColor: colors.lime },
-  primary: { backgroundColor: colors.lime, borderRadius: 999, paddingVertical: 14, alignItems: 'center' },
-  primaryTxt: { color: colors.onLime, fontWeight: '800', fontSize: 15 },
+  edit: { color: colors.accent, fontSize: 17, marginBottom: 6 },
+  back: { flexDirection: 'row', alignItems: 'center', paddingLeft: 12 },
+  rowPlain: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 20 },
+  favIcon: { width: 26, alignItems: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 20 },
+  rowText: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 20, minHeight: 56, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  heart: { width: 56, height: 56, borderRadius: 6, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, paddingHorizontal: 20 },
+  gTitle: { fontSize: 14, fontWeight: '600', color: colors.text, marginTop: 8 },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
+  dialog: { position: 'absolute', left: 28, right: 28, top: '30%', backgroundColor: '#fff', borderRadius: 16, padding: 20, gap: 14 },
+  input: { backgroundColor: colors.surface, color: colors.text, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 17 },
+  btn: { backgroundColor: colors.accent, borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
+  btnTxt: { color: '#fff', fontWeight: '700', fontSize: 16 },
 });

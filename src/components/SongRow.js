@@ -4,36 +4,41 @@ import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
 import Cover from './Cover';
 import EqBars from './EqBars';
-import { colors, type } from '../theme';
+import { colors } from '../theme';
 import { bandById } from '../data';
 import { clock, compact } from '../lib/format';
 import { useApp } from '../store';
 
+// Fila de canción con separador fino que empieza en el texto (estilo Apple).
 export default function SongRow({ song, list, index, context, showPlays = true }) {
-  const { current, status, play, favorites, openSheet } = useApp();
+  const { current, status, play, openSheet } = useApp();
   const band = bandById(song.bandId);
   const active = current?.id === song.id;
-  const fav = favorites.includes(song.id);
   return (
-    <Press onPress={() => play(song.id, list, context)} onLongPress={() => openSheet(song.id)} scale={0.98} style={s.row} accessibilityRole="button" accessibilityLabel={`Reproducir ${song.title} de ${band.name}`}>
-      {index != null && !active && <Text style={s.idx}>{index + 1}</Text>}
-      {active && <View style={s.idxBox}><EqBars active={status.playing} /></View>}
-      <Cover band={band} size={50} radius={8} seed={song.id} />
-      <View style={{ flex: 1 }}>
-        <Text numberOfLines={1} style={[type.h3, active && { color: colors.lime }]}>{song.title}</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          {fav && <Ionicons name="heart" size={12} color={colors.pink} />}
-          <Text numberOfLines={1} style={[type.small, { flex: 1 }]}>{band.name}{showPlays ? ` · ${compact(song.plays)} reprod.` : ` · ${clock(song.duration)}`}</Text>
-        </View>
+    <Press onPress={() => play(song.id, list, context)} onLongPress={() => openSheet(song.id)} scale={0.99} style={s.row} accessibilityRole="button" accessibilityLabel={`Reproducir ${song.title} de ${band.name}`}>
+      {index != null && <View style={s.idxBox}>{active ? <EqBars active={status.playing} /> : <Text style={s.idx}>{index + 1}</Text>}</View>}
+      <View>
+        <Cover band={band} size={48} radius={6} seed={song.id} />
+        {active && index == null && <View style={s.over}><EqBars active={status.playing} color="#fff" height={14} /></View>}
       </View>
-      <Press onPress={() => openSheet(song.id)} scale={0.8} hitSlop={12} accessibilityLabel="Más opciones">
-        <Ionicons name="ellipsis-horizontal" size={20} color={colors.muted} />
-      </Press>
+      <View style={s.text}>
+        <View style={{ flex: 1 }}>
+          <Text numberOfLines={1} style={[s.title, active && { color: colors.accent }]}>{song.title}</Text>
+          <Text numberOfLines={1} style={s.sub}>{band.name}{showPlays ? ` · ${compact(song.plays)} reprod.` : ` · ${clock(song.duration)}`}</Text>
+        </View>
+        <Press onPress={() => openSheet(song.id)} scale={0.8} hitSlop={12} accessibilityLabel="Más opciones">
+          <Ionicons name="ellipsis-horizontal" size={20} color={colors.muted} />
+        </Press>
+      </View>
     </Press>
   );
 }
 const s = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
-  idx: { width: 18, textAlign: 'center', color: colors.muted, fontWeight: '700' },
-  idxBox: { width: 18, alignItems: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 0 },
+  idxBox: { width: 20, alignItems: 'center' },
+  idx: { color: colors.muted, fontWeight: '600', fontSize: 15 },
+  over: { ...StyleSheet.absoluteFillObject, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' },
+  text: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 60, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  title: { fontSize: 16, fontWeight: '500', color: colors.text },
+  sub: { fontSize: 14, color: colors.muted, marginTop: 1 },
 });

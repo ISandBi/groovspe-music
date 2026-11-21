@@ -3,7 +3,7 @@ import { Animated, Easing, View } from 'react-native';
 import { colors } from '../theme';
 
 // Ecualizador animado. active=false lo congela en reposo.
-export default function EqBars({ active = true, color = colors.lime, height = 16 }) {
+export default function EqBars({ active = true, color = colors.accent, height = 16 }) {
   const bars = useRef([0, 1, 2, 3].map(() => new Animated.Value(0.3))).current;
   useEffect(() => {
     const loops = bars.map((v, i) => {

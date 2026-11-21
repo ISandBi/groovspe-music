@@ -12,6 +12,10 @@ Inicio con accesos rápidos y estanterías, buscador con tiles por género, bibl
 
 Las bandas marcadas como *referencia* (Café Tacvba, Zoé, Joy Division, Los Ángeles Azules, Daft Punk, Tool, Queen, Nirvana, Coldplay) se reproducen con el **reproductor oficial incrustado de YouTube**: no se descargan ni se alojan archivos. Sirven solo para probar el audio/video del reproductor (selector **Audio | Video**); **no acreditan saldo**. Algunos videos pueden bloquear la reproducción incrustada; en ese caso la app ofrece abrirlos en YouTube. Antes de publicar, sustituye este contenido por los masters grabados en GrooveSpace (`src/data.js`) o por material con licencia.
 
+## Diseño
+
+Interfaz clara y limpia al estilo de un reproductor moderno (títulos grandes, portadas con sombra, barras con efecto cristal y reproductor con fondo dinámico), con la paleta de GrooveSpace: rosa como acento principal, violeta e índigo como apoyo. Usa `expo-blur`; si falta: `npx expo install expo-blur`.
+
 ## Qué necesitas instalar
 
 1. **Node.js LTS** (https://nodejs.org) — incluye `npm`.

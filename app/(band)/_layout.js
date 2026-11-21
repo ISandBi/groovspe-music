@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,10 +14,10 @@ export default function BandLayout() {
   return (
     <Tabs screenOptions={{
       headerShown: false,
-      tabBarActiveTintColor: colors.pink,
+      tabBarActiveTintColor: colors.accent,
       tabBarInactiveTintColor: colors.muted,
       tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
-      tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line, height: barH, paddingTop: 6, paddingBottom: insets.bottom + 4 },
+      tabBarStyle: { backgroundColor: '#fff', borderTopColor: colors.line, borderTopWidth: StyleSheet.hairlineWidth, height: barH, paddingTop: 6, paddingBottom: insets.bottom + 2 },
       sceneStyle: { backgroundColor: colors.bg },
     }}>
       <Tabs.Screen name="panel" options={{ title: 'Panel', tabBarIcon: icon('grid', 'grid-outline') }} />

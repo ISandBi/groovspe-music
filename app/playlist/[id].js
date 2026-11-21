@@ -1,7 +1,6 @@
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Cover from '../../src/components/Cover';
@@ -11,7 +10,6 @@ import SongRow from '../../src/components/SongRow';
 import MiniPlayer from '../../src/components/MiniPlayer';
 import { colors, type } from '../../src/theme';
 import { songById } from '../../src/data';
-import { clock } from '../../src/lib/format';
 import { useApp } from '../../src/store';
 
 export default function PlaylistScreen() {
@@ -20,7 +18,7 @@ export default function PlaylistScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const isFav = id === 'fav';
-  const pl = isFav ? { id: 'fav', name: 'Canciones que te gustan', desc: 'Tus favoritas de GrooveSpace.', colors: [colors.pink, '#8b5cff'], songIds: favorites } : getPlaylist(id);
+  const pl = isFav ? { id: 'fav', name: 'Favoritas', desc: 'Tus canciones favoritas de GrooveSpace.', colors: [colors.accent, '#8b5cff'], songIds: favorites } : getPlaylist(id);
   if (!pl) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   const songs = pl.songIds.map(songById).filter(Boolean);
   const total = songs.reduce((n, x) => n + x.duration, 0);
@@ -35,28 +33,32 @@ export default function PlaylistScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 170 }} showsVerticalScrollIndicator={false}>
-        <LinearGradient colors={[pl.colors[0], pl.colors[1] + 'cc', colors.bg]} locations={[0, 0.6, 1]} style={{ paddingTop: insets.top + 12, alignItems: 'center', paddingBottom: 24 }}>
-          <View style={s.bar}>
-            <Press onPress={() => router.back()} style={s.round} accessibilityLabel="Volver"><Ionicons name="chevron-back" size={22} color="#fff" /></Press>
-            {mine && <Press onPress={() => Alert.alert('Eliminar lista', `¿Eliminar “${pl.name}”?`, [{ text: 'Cancelar' }, { text: 'Eliminar', style: 'destructive', onPress: () => { deletePlaylist(pl.id); router.back(); } }])} style={s.round} accessibilityLabel="Eliminar lista"><Ionicons name="trash-outline" size={20} color="#fff" /></Press>}
-          </View>
-          <FadeIn y={24}>{isFav ? <View style={[s.favArt]}><Ionicons name="heart" size={90} color="#fff" /></View> : <Cover band={pl} size={190} radius={14} seed={String(id)} />}</FadeIn>
-        </LinearGradient>
+        <View style={[s.bar, { paddingTop: insets.top + 8 }]}>
+          <Press onPress={() => router.back()} style={s.round} accessibilityLabel="Volver"><Ionicons name="chevron-back" size={22} color={colors.accent} /></Press>
+          {mine && <Press onPress={() => Alert.alert('Eliminar lista', `¿Eliminar “${pl.name}”?`, [{ text: 'Cancelar' }, { text: 'Eliminar', style: 'destructive', onPress: () => { deletePlaylist(pl.id); router.back(); } }])} style={s.round} accessibilityLabel="Eliminar lista"><Ionicons name="trash-outline" size={20} color={colors.accent} /></Press>}
+        </View>
 
-        <FadeIn delay={100} style={{ paddingHorizontal: 20 }}>
-          <Text style={[type.h1, { fontSize: 30 }]}>{pl.name}</Text>
-          {!!pl.desc && <Text style={[type.body, { marginTop: 4, color: colors.muted }]}>{pl.desc}</Text>}
-          <Text style={[type.small, { marginTop: 8 }]}>{songs.length} canciones · {Math.round(total / 60)} min</Text>
-          <View style={s.actions}>
-            <Press onPress={() => startPlay(true)} style={[s.round2, shuffle && { backgroundColor: colors.limeSoft }]} accessibilityLabel="Aleatorio"><Ionicons name="shuffle" size={24} color={colors.lime} /></Press>
-            <View style={{ flex: 1 }} />
-            <Press onPress={() => startPlay(false)} scale={0.92} style={s.big} accessibilityLabel="Reproducir"><Ionicons name="play" size={30} color={colors.onLime} style={{ marginLeft: 3 }} /></Press>
+        <FadeIn y={20} style={{ alignItems: 'center', marginTop: 4 }}>
+          {isFav
+            ? <View style={[s.favArt, { backgroundColor: colors.accent }]}><Ionicons name="heart" size={90} color="#fff" /></View>
+            : <Cover band={pl} size={250} radius={12} seed={String(id)} elevated />}
+        </FadeIn>
+
+        <FadeIn delay={100} style={{ alignItems: 'center', paddingHorizontal: 24, marginTop: 20 }}>
+          <Text style={s.title} numberOfLines={2}>{pl.name}</Text>
+          <Text style={s.curator}>{isFav ? 'Tu biblioteca' : String(id).startsWith('u') ? 'Tu lista' : 'GrooveSpace'}</Text>
+          {!!pl.desc && <Text style={[type.small, { textAlign: 'center', marginTop: 6 }]}>{pl.desc}</Text>}
+          <View style={s.buttons}>
+            <Press onPress={() => startPlay(false)} style={s.pill}><Ionicons name="play" size={20} color={colors.accent} /><Text style={s.pillTxt}>Reproducir</Text></Press>
+            <Press onPress={() => startPlay(true)} style={s.pill}><Ionicons name="shuffle" size={20} color={colors.accent} /><Text style={s.pillTxt}>Aleatorio</Text></Press>
           </View>
         </FadeIn>
 
-        <View style={{ paddingHorizontal: 20, marginTop: 4 }}>
+        <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
+          <View style={s.hair} />
           {songs.map((song) => <SongRow key={song.id} song={song} list={pl.songIds} context={pl.name} showPlays={false} />)}
           {songs.length === 0 && <Text style={[type.body, { textAlign: 'center', marginTop: 30 }]}>Esta lista está vacía. Usa “⋯ → Añadir a una lista” en cualquier canción.</Text>}
+          {songs.length > 0 && <Text style={[type.small, { marginTop: 14 }]}>{songs.length} canciones, {Math.round(total / 60)} minutos</Text>}
         </View>
       </ScrollView>
       <MiniPlayer bottom={insets.bottom + 10} />
@@ -64,10 +66,13 @@ export default function PlaylistScreen() {
   );
 }
 const s = StyleSheet.create({
-  bar: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, marginBottom: 12 },
-  round: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(16,13,23,0.5)', alignItems: 'center', justifyContent: 'center' },
-  favArt: { width: 190, height: 190, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
-  actions: { flexDirection: 'row', alignItems: 'center', marginTop: 14, marginBottom: 6 },
-  round2: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  big: { width: 62, height: 62, borderRadius: 31, backgroundColor: colors.lime, alignItems: 'center', justifyContent: 'center' },
+  bar: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 },
+  round: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  favArt: { width: 250, height: 250, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: colors.text, textAlign: 'center', letterSpacing: -0.4 },
+  curator: { fontSize: 20, color: colors.accent, marginTop: 2 },
+  buttons: { flexDirection: 'row', gap: 12, marginTop: 18, width: '100%' },
+  pill: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.surface, borderRadius: 12, paddingVertical: 14 },
+  pillTxt: { color: colors.accent, fontSize: 17, fontWeight: '600' },
+  hair: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
 });

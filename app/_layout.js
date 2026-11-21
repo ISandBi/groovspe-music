@@ -14,7 +14,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AppProvider>
         <View style={{ flex: 1, backgroundColor: colors.bg }}>
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'fade' }}>
             <Stack.Screen name="queue" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="playlist/[id]" options={{ animation: 'slide_from_right' }} />

@@ -1,28 +1,33 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
 import { colors } from '../theme';
 
 // Anuncio propio de GrooveSpace (eventos, bandas nuevas, renta de salas). Solo versión gratuita.
-export default function AdCard({ ad, compact }) {
+export default function AdCard({ ad, compact, dark }) {
   return (
-    <Press scale={0.98} accessibilityRole="button" accessibilityLabel={`Anuncio: ${ad.title}`}>
-      <LinearGradient colors={ad.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.card, compact && { padding: 14 }]}>
-        <View style={s.tag}><Text style={s.tagTxt}>ANUNCIO · {ad.kicker}</Text></View>
-        <Text style={[s.title, compact && { fontSize: 18 }]}>{ad.title}</Text>
-        <Text style={s.text}>{ad.text}</Text>
-        <View style={s.cta}><Text style={s.ctaTxt}>{ad.cta}</Text></View>
+    <Press scale={0.985} style={[s.card, dark && s.dark]} accessibilityRole="button" accessibilityLabel={`Anuncio: ${ad.title}`}>
+      <LinearGradient colors={ad.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.thumb, compact && { width: 44, height: 44 }]}>
+        <Ionicons name="sparkles" size={compact ? 18 : 22} color="#fff" />
       </LinearGradient>
+      <View style={{ flex: 1 }}>
+        <Text style={[s.tag, dark && { color: 'rgba(255,255,255,0.7)' }]}>ANUNCIO · {ad.kicker}</Text>
+        <Text numberOfLines={1} style={[s.title, dark && { color: '#fff' }]}>{ad.title}</Text>
+        {!compact && <Text numberOfLines={2} style={[s.text, dark && { color: 'rgba(255,255,255,0.8)' }]}>{ad.text}</Text>}
+      </View>
+      <View style={[s.cta, dark && { backgroundColor: '#fff' }]}><Text style={[s.ctaTxt, dark && { color: colors.text }]}>{ad.cta}</Text></View>
     </Press>
   );
 }
 const s = StyleSheet.create({
-  card: { borderRadius: 22, padding: 20, overflow: 'hidden' },
-  tag: { alignSelf: 'flex-start', backgroundColor: 'rgba(16,13,23,0.55)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginBottom: 12 },
-  tagTxt: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  title: { color: '#fff', fontSize: 22, fontWeight: '800', letterSpacing: -0.5 },
-  text: { color: 'rgba(255,255,255,0.9)', marginTop: 4, fontSize: 14 },
-  cta: { alignSelf: 'flex-start', marginTop: 14, backgroundColor: colors.bg, paddingHorizontal: 16, paddingVertical: 9, borderRadius: 999 },
-  ctaTxt: { color: colors.text, fontWeight: '700', fontSize: 13 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.surface, borderRadius: 14, padding: 12 },
+  dark: { backgroundColor: 'rgba(255,255,255,0.16)' },
+  thumb: { width: 56, height: 56, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  tag: { fontSize: 10, fontWeight: '700', letterSpacing: 0.6, color: colors.muted },
+  title: { fontSize: 15, fontWeight: '700', color: colors.text, marginTop: 1 },
+  text: { fontSize: 13, color: colors.muted, marginTop: 1 },
+  cta: { backgroundColor: colors.accent, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999 },
+  ctaTxt: { color: '#fff', fontWeight: '700', fontSize: 13 },
 });
