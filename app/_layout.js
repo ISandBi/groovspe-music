@@ -14,7 +14,7 @@ function Shell() {
   return (
         <View style={{ flex: 1, backgroundColor: colors.bg }}>
           <StatusBar style={dark ? 'light' : 'dark'} />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'fade' }}>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'slide_from_right' }}>
             <Stack.Screen name="queue" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="playlist/[id]" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="player" options={{ animation: 'slide_from_bottom', gestureEnabled: true, gestureDirection: 'vertical' }} />

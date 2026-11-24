@@ -12,13 +12,14 @@ import { useTheme } from '../../src/theme';
 import { bandById, songById } from '../../src/data';
 import { LESSONS } from '../../src/learn';
 import { getLyrics } from '../../src/lib/lyrics';
-import { useApp } from '../../src/store';
+import { useApp, useStatus } from '../../src/store';
 
 // Aprende a tocar (Premium): acordes, tempo, metrónomo y letra con el acorde de cada línea, siguiendo la canción.
 export default function Learn() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { id } = useLocalSearchParams();
-  const { premium, current, status, play, toggle, seek } = useApp();
+  const { premium, current, play, toggle, seek } = useApp();
+  const status = useStatus();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const song = songById(id);

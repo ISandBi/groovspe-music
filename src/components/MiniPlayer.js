@@ -6,12 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
 import Cover from './Cover';
 import { MINI_HEIGHT, useTheme } from '../theme';
-import { useApp } from '../store';
+import { useApp, useStatus } from '../store';
 
 // Barra "reproduciendo ahora" con efecto cristal sobre la barra de pestañas. Al tocarla se abre el reproductor.
 export default function MiniPlayer({ bottom }) {
   const { colors, type, dark } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { current, band, status, toggle, step, isYt, videoMode } = useApp();
+  const status = useStatus();
+  const { current, band, toggle, step, isYt, videoMode } = useApp();
   const router = useRouter();
   const v = useRef(new Animated.Value(0)).current;
   useEffect(() => { Animated.spring(v, { toValue: current ? 1 : 0, useNativeDriver: true, bounciness: 6 }).start(); }, [!!current]); // eslint-disable-line

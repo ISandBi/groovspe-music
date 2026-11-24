@@ -12,12 +12,13 @@ import Lyrics from '../src/components/Lyrics';
 import { shadow, useTheme } from '../src/theme';
 import { ADS } from '../src/data';
 import { clock } from '../src/lib/format';
-import { useApp } from '../src/store';
+import { useApp, useStatus } from '../src/store';
 
 // Reproductor "ahora suena": fondo dinámico con los colores de la banda, portada grande y controles blancos.
 export default function Player() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { current, band, status, toggle, step, seek, favorites, toggleFav, premium, adGate, user, isBand, shuffle, repeat, toggleShuffle, cycleRepeat, context, openSheet, isYt, videoMode, viewMode, setMode, setVideoRect, openOnYoutube } = useApp();
+  const status = useStatus();
+  const { current, band, toggle, step, seek, favorites, toggleFav, premium, adGate, user, isBand, shuffle, repeat, toggleShuffle, cycleRepeat, context, openSheet, isYt, videoMode, viewMode, setMode, setVideoRect, openOnYoutube } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();

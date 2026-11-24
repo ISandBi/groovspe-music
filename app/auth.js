@@ -15,7 +15,9 @@ export default function Auth() {
   const { mode: m } = useLocalSearchParams();
   const [mode, setMode] = useState(m === 'login' ? 'login' : 'register');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [mailUser, setMailUser] = useState('');
+  const [domain, setDomain] = useState('gmail.com');
+  const email = `${mailUser.trim()}@${domain.trim()}`;
   const [pass, setPass] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -63,8 +65,19 @@ export default function Auth() {
             <FadeIn delay={150} style={{ marginTop: 26, gap: 14 }}>
               <View style={s.group}>
                 {reg && <Field label="Nombre" value={name} onChangeText={setName} placeholder="Nombre" autoCapitalize="words" />}
-                <Field label="Correo" value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" autoCapitalize="none" />
-                <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder="Contraseña (mínimo 6)" secureTextEntry last />
+                <View style={[s.field, { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TextInput accessibilityLabel="Usuario del correo" value={mailUser} onChangeText={(v) => { if (v.includes('@')) { const [u, d] = v.split('@'); setMailUser(u); if (d) setDomain(d); } else setMailUser(v); }} placeholder="usuario" placeholderTextColor={colors.muted} selectionColor={colors.accent} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="username" style={[s.input, { flex: 1.1 }]} />
+                    <Text style={s.at}>@</Text>
+                    <TextInput accessibilityLabel="Dominio del correo" value={domain} onChangeText={(v) => setDomain(v.replace(/\s/g, '').toLowerCase())} placeholder="gmail.com" placeholderTextColor={colors.muted} selectionColor={colors.accent} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} style={[s.input, { flex: 1 }]} />
+                  </View>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 6, paddingBottom: 10 }}>
+                    {['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'icloud.com'].map((d) => (
+                      <Pressable key={d} onPress={() => setDomain(d)} style={[s.dom, domain === d && { backgroundColor: colors.accentSoft, borderColor: colors.accent }]}><Text style={[s.domTxt, domain === d && { color: colors.accent }]}>@{d}</Text></Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+                <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder={reg ? 'Contraseña (mínimo 6)' : 'Contraseña'} password autoComplete="password" last />
               </View>
               {!!error && <Text style={s.error}>{error}</Text>}
               <Press onPress={busy ? undefined : submit} style={[s.primary, busy && { opacity: 0.7 }]}>
@@ -81,14 +94,23 @@ export default function Auth() {
     </View>
   );
 }
-function Field({ label, last, ...p }) {
+function Field({ label, last, password, ...p }) {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  const [show, setShow] = useState(false);
   return (
     <View style={[s.field, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }]}>
-      <TextInput {...p} accessibilityLabel={label} placeholderTextColor={colors.muted} selectionColor={colors.accent} style={s.input} />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextInput {...p} secureTextEntry={!!password && !show} accessibilityLabel={label} placeholderTextColor={colors.muted} selectionColor={colors.accent} autoCapitalize={p.autoCapitalize || 'none'} autoCorrect={false} style={[s.input, { flex: 1 }]} />
+        {password && (
+          <Pressable onPress={() => setShow((v) => !v)} hitSlop={12} accessibilityLabel={show ? 'Ocultar contraseña' : 'Mostrar contraseña'} style={{ paddingLeft: 10 }}>
+            <Ionicons name={show ? 'eye-off-outline' : 'eye-outline'} size={22} color={colors.muted} />
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 }
+
 const makeS = (colors, type) => StyleSheet.create({
   back: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingVertical: 6 },
   backTxt: { color: colors.accent, fontSize: 17 },
@@ -99,6 +121,9 @@ const makeS = (colors, type) => StyleSheet.create({
   group: { backgroundColor: colors.surface, borderRadius: 12, overflow: 'hidden' },
   field: { paddingHorizontal: 16 },
   input: { color: colors.text, fontSize: 17, paddingVertical: 14 },
+  at: { color: colors.muted, fontSize: 17, paddingHorizontal: 4 },
+  dom: { borderWidth: StyleSheet.hairlineWidth, borderColor: colors.line, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
+  domTxt: { color: colors.muted, fontSize: 12, fontWeight: '600' },
   error: { color: colors.accent, fontWeight: '600', textAlign: 'center' },
   primary: { backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
   primaryTxt: { color: '#fff', fontWeight: '700', fontSize: 17 },

@@ -9,7 +9,10 @@ import { LOCK_SCREEN } from './lib/config';
 
 const KEY = 'groovespace-music-v2';
 const Ctx = createContext(null);
+const StatusCtx = createContext({ playing: false, currentTime: 0, duration: 0, didJustFinish: false, error: null });
 export const useApp = () => useContext(Ctx);
+// El progreso cambia varias veces por segundo: va en su propio contexto para no redibujar toda la app.
+export const useStatus = () => useContext(StatusCtx);
 const today = () => new Date().toISOString().slice(0, 10);
 const tap = (f = 'Light') => Haptics.impactAsync(Haptics.ImpactFeedbackStyle[f]).catch(() => {});
 
@@ -17,6 +20,7 @@ export function AppProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState(null); // { role: 'listener' | 'band', name, email, bandId?, token? }
   const [premium, setPremium] = useState(false);
+  const [card, setCard] = useState(null); // solo { brand, last4 }: nunca el número completo ni el CVV (PCI DSS 3.3)
   const [favorites, setFavorites] = useState([]);
   const [recent, setRecent] = useState([]);
   const [playlists, setPlaylists] = useState([]); // listas del usuario
@@ -49,7 +53,7 @@ export function AppProvider({ children }) {
         const raw = await AsyncStorage.getItem(KEY);
         if (raw) {
           const s = JSON.parse(raw);
-          setUser(s.user || null); setPremium(!!s.premium); setFavorites(s.favorites || []);
+          setUser(s.user || null); setPremium(!!s.premium); setCard(s.card || null); setFavorites(s.favorites || []);
           setRecent(s.recent || []); setCredited(s.credited || {}); setPlays(s.plays || 0);
           setPlaylists(s.playlists || []); setFollowed(s.followed || []); setThemeMode(s.themeMode || 'system');
         }
@@ -60,13 +64,14 @@ export function AppProvider({ children }) {
   }, []);
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(KEY, JSON.stringify({ user, premium, favorites, recent, credited, plays, playlists, followed, themeMode })).catch(() => {});
-  }, [ready, user, premium, favorites, recent, credited, plays, playlists, followed, themeMode]);
+    AsyncStorage.setItem(KEY, JSON.stringify({ user, premium, card, favorites, recent, credited, plays, playlists, followed, themeMode })).catch(() => {});
+  }, [ready, user, premium, card, favorites, recent, credited, plays, playlists, followed, themeMode]);
 
   const showToast = useCallback((msg) => setToast({ msg, id: Date.now() }), []);
   const current = currentId ? songById(currentId) : null;
   const isYt = !!current?.yt;
   const status = isYt ? ytStatus : audioStatus;
+  const playing = !!status.playing;
   const ytCmd = useCallback((c, v = 0) => { ytRef.current?.injectJavaScript(`window.cmd(${JSON.stringify(c)},${Number(v)});true;`); }, []);
 
   // Mensajes del reproductor de YouTube -> estado unificado.
@@ -107,9 +112,9 @@ export function AppProvider({ children }) {
   const toggle = useCallback(() => {
     if (!current) return;
     Haptics.selectionAsync().catch(() => {});
-    if (isYt) { ytCmd(status.playing ? 'pause' : 'play'); return; }
-    if (status.playing) player.pause(); else player.play();
-  }, [current, isYt, status.playing, player, ytCmd]);
+    if (isYt) { ytCmd(playing ? 'pause' : 'play'); return; }
+    if (playing) player.pause(); else player.play();
+  }, [current, isYt, playing, player, ytCmd]);
 
   const step = useCallback((dir, auto = false) => {
     if (!current || !queue.length) return;
@@ -183,14 +188,15 @@ export function AppProvider({ children }) {
   const getPlaylist = useCallback((id) => playlistById(id) || playlists.find((l) => l.id === id), [playlists]);
 
   const value = useMemo(() => ({
-    ready, user, setUser, isBand, premium, setPremium, favorites, toggleFav, recent, plays,
-    current, band, status, play, toggle, step, seek, queue, context, toast, showToast, adGate,
+    ready, user, setUser, isBand, premium, setPremium, card, subscribe: (c) => { setCard(c); setPremium(true); }, cancelPremium: () => { setCard(null); setPremium(false); }, favorites, toggleFav, recent, plays,
+    current, band, playing, play, toggle, step, seek, queue, context, toast, showToast, adGate,
     shuffle, repeat, toggleShuffle, cycleRepeat, enqueueNext,
     playlists, createPlaylist, addToPlaylist, removeFromPlaylist, deletePlaylist, getPlaylist,
     followed, toggleFollow, sheetSong, openSheet: setSheetSong, closeSheet: () => setSheetSong(null),
     logout: () => { setUser(null); try { player.pause(); } catch (e) {} ytCmd('pause'); },
     isYt, videoMode, viewMode, themeMode, setThemeMode, setMode, videoRect, setVideoRect, ytRef, ytId, onYtMessage, openOnYoutube,
-  }), [ready, user, isBand, premium, favorites, recent, plays, current, band, status, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, viewMode, themeMode, videoRect, ytId]); // eslint-disable-line
+  }), [ready, user, isBand, premium, card, favorites, recent, plays, current, band, playing, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, viewMode, themeMode, videoRect, ytId]); // eslint-disable-line
 
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  const statusValue = useMemo(() => status, [status.playing, status.currentTime, status.duration, status.didJustFinish, status.error]); // eslint-disable-line
+  return <Ctx.Provider value={value}><StatusCtx.Provider value={statusValue}>{children}</StatusCtx.Provider></Ctx.Provider>;
 }

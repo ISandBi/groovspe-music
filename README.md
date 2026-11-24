@@ -101,3 +101,5 @@ src/
 - **Portadas reales** de las canciones de referencia vía iTunes Search API (con caché); las canciones de GrooveSpace usan portada generada.
 - **Letras**: propias para las canciones de GrooveSpace; LRCLIB (con respaldo lyrics.ovh) para las demás.
 - **Premium · Aprende a tocar**: acordes, diagramas, tempo, metrónomo y letra con acordes. Solo con Premium (activable en modo demostración) y solo para canciones de GrooveSpace.
+- **Pagos con tarjeta (demo)** con controles PCI DSS 4.0.1 y NIST CSF 2.0: ver `docs/SEGURIDAD-PAGOS.md`. Tarjeta de prueba: 4242 4242 4242 4242.
+- **Rendimiento**: el progreso de reproducción tiene su propio contexto; para medir la velocidad real usa `npx expo start --no-dev --minify`.

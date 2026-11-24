@@ -12,15 +12,15 @@ import { useApp } from '../store';
 // Fila de canción con separador fino que empieza en el texto (estilo Apple).
 export default function SongRow({ song, list, index, context, showPlays = true }) {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { current, status, play, openSheet } = useApp();
+  const { current, playing, play, openSheet } = useApp();
   const band = bandById(song.bandId);
   const active = current?.id === song.id;
   return (
     <Press onPress={() => play(song.id, list, context)} onLongPress={() => openSheet(song.id)} scale={0.99} style={s.row} accessibilityRole="button" accessibilityLabel={`Reproducir ${song.title} de ${band.name}`}>
-      {index != null && <View style={s.idxBox}>{active ? <EqBars active={status.playing} /> : <Text style={s.idx}>{index + 1}</Text>}</View>}
+      {index != null && <View style={s.idxBox}>{active ? <EqBars active={playing} /> : <Text style={s.idx}>{index + 1}</Text>}</View>}
       <View>
         <Cover band={band} size={48} radius={6} seed={song.id} />
-        {active && index == null && <View style={s.over}><EqBars active={status.playing} color="#fff" height={14} /></View>}
+        {active && index == null && <View style={s.over}><EqBars active={playing} color="#fff" height={14} /></View>}
       </View>
       <View style={s.text}>
         <View style={{ flex: 1 }}>

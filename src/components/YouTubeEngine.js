@@ -14,12 +14,12 @@ var tag=document.createElement('script');tag.src='https://www.youtube.com/iframe
 function onYouTubeIframeAPIReady(){
   player=new YT.Player('p',{width:'100%',height:'100%',playerVars:{origin:'https://music.groovespace.example',playsinline:1,controls:0,rel:0,modestbranding:1,fs:0,disablekb:1,iv_load_policy:3},
     events:{
-      onReady:function(){ready=true;post({t:'ready'});if(pending){player.loadVideoById(pending);pending=null}},
+      onReady:function(){ready=true;post({t:'ready'});if(pending){player.loadVideoById({videoId:pending,suggestedQuality:'medium'});pending=null}},
       onStateChange:function(e){post({t:'state',s:e.data})},
       onError:function(e){post({t:'error',c:e.data})}
     }});
 }
-window.load=function(id){if(ready){player.loadVideoById(id)}else{pending=id}};
+window.load=function(id){if(ready){player.loadVideoById({videoId:id,suggestedQuality:'medium'})}else{pending=id}};
 window.cmd=function(c,v){if(!ready)return;if(c==='play')player.playVideo();if(c==='pause')player.pauseVideo();if(c==='seek')player.seekTo(v,true)};
 setInterval(function(){if(ready&&player.getCurrentTime){post({t:'time',c:player.getCurrentTime(),d:player.getDuration()})}},500);
 </script></body></html>`;
