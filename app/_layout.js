@@ -19,6 +19,8 @@ function Shell() {
             <Stack.Screen name="playlist/[id]" options={{ animation: 'slide_from_right' }} />
             <Stack.Screen name="player" options={{ animation: 'slide_from_bottom', gestureEnabled: true, gestureDirection: 'vertical' }} />
             <Stack.Screen name="(band)" options={{ animation: 'fade' }} />
+            <Stack.Screen name="learn/[id]" options={{ animation: 'slide_from_right' }} />
+            <Stack.Screen name="premium" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="band/[id]" options={{ animation: 'slide_from_right' }} />
           </Stack>
           <YouTubeEngine />

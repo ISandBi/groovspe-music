@@ -52,6 +52,12 @@ export default function Home() {
         </Shelf>
       </Section>
 
+      <Section title="Aprende a tocar · Premium">
+        <Shelf>
+          {OWN.slice(0, 8).map((song) => <Card key={song.id} item={bandById(song.bandId)} title={song.title} subtitle={premium ? 'Acordes y tempo' : 'Premium'} seed={song.id} onPress={() => router.push(`/learn/${song.id}`)} />)}
+        </Shelf>
+      </Section>
+
       <Section title="Con audio y video">
         <Shelf>
           {REAL.map((song) => <Card key={song.id} item={bandById(song.bandId)} title={song.title} subtitle={bandById(song.bandId).name} seed={song.id} onPress={() => play(song.id, REAL.map((x) => x.id), 'Con audio y video')} />)}

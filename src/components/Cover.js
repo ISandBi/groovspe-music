@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { shadow, useTheme } from '../theme';
+import { useArtwork } from '../lib/artwork';
 
 // Carátula generada: degradado de la banda + iniciales. `elevated` añade la sombra suave tipo álbum.
 export default function Cover({ band, size = 56, radius = 10, style, seed = 0, elevated }) {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  const art = useArtwork(seed);
   const n = typeof seed === 'number' ? seed : [...String(seed)].reduce((a, c) => a + c.charCodeAt(0), 0);
   const dirs = [[0, 0, 1, 1], [1, 0, 0, 1], [0, 1, 1, 0], [0.5, 0, 0.5, 1]];
   const d = dirs[n % 4];
@@ -17,6 +19,7 @@ export default function Cover({ band, size = 56, radius = 10, style, seed = 0, e
         <View style={[s.ring, { width: size * 0.6, height: size * 0.6, borderRadius: size, left: -size * 0.15, bottom: -size * 0.2 }]} />
         <Text style={[s.txt, { fontSize: size * 0.3, left: size * 0.1, bottom: size * 0.07 }]}>{initials}</Text>
       </LinearGradient>
+      {art ? <Image source={{ uri: art }} resizeMode="cover" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} /> : null}
     </View>
   );
 }

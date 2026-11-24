@@ -31,7 +31,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="home" options={{ title: 'Escuchar', tabBarIcon: icon('play-circle', 'play-circle-outline') }} />
         <Tabs.Screen name="library" options={{ title: 'Biblioteca', tabBarIcon: icon('albums', 'albums-outline') }} />
         <Tabs.Screen name="explore" options={{ title: 'Buscar', tabBarIcon: icon('search', 'search-outline') }} />
-        <Tabs.Screen name="profile" options={{ href: null }} />
+        <Tabs.Screen name="profile" options={{ title: 'Cuenta', tabBarIcon: icon('person-circle', 'person-circle-outline') }} />
       </Tabs>
       <MiniPlayer bottom={barH + 6} />
     </View>

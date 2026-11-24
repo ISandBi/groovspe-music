@@ -93,3 +93,11 @@ src/
 
 - Conectar `src/lib/api.js` con el backend MERN de GrooveSpace (sesión de oyente, catálogo, reproducciones, saldo).
 - Añadir icono y splash definitivos (`assets/`) y revisar el Aviso de Privacidad y los Términos antes de publicar.
+
+
+## Novedades
+
+- **Cuenta**: pestaña propia con editar nombre, apariencia (claro/oscuro/automático), Premium y cerrar sesión.
+- **Portadas reales** de las canciones de referencia vía iTunes Search API (con caché); las canciones de GrooveSpace usan portada generada.
+- **Letras**: propias para las canciones de GrooveSpace; LRCLIB (con respaldo lyrics.ovh) para las demás.
+- **Premium · Aprende a tocar**: acordes, diagramas, tempo, metrónomo y letra con acordes. Solo con Premium (activable en modo demostración) y solo para canciones de GrooveSpace.

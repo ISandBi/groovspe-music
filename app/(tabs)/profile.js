@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Press from '../../src/components/Press';
@@ -11,7 +11,10 @@ import { useApp } from '../../src/store';
 
 export default function Profile() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { user, premium, setPremium, plays, favorites, logout } = useApp();
+  const { user, setUser, premium, plays, favorites, logout } = useApp();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(user?.name || '');
+  const save = () => { if (name.trim().length >= 2) setUser({ ...user, name: name.trim() }); setEditing(false); };
   const router = useRouter();
   const initial = (user?.name || '?')[0].toUpperCase();
   const rules = [
@@ -25,13 +28,19 @@ export default function Profile() {
   return (
     <ScrollView style={{ backgroundColor: colors.groupBg }} contentContainerStyle={{ paddingBottom: 190 }} showsVerticalScrollIndicator={false}>
       <View style={{ backgroundColor: colors.groupBg }}>
-        <Header title="Cuenta" right={<Press onPress={() => router.back()} hitSlop={10}><Text style={s.done}>Listo</Text></Press>} />
+        <Header title="Cuenta" />
       </View>
 
       <View style={s.group}>
         <View style={s.profile}>
           <View style={s.avatar}><Text style={s.avatarTxt}>{initial}</Text></View>
-          <View style={{ flex: 1 }}><Text style={type.h2}>{user?.name}</Text><Text style={type.small}>{user?.email}</Text></View>
+          <View style={{ flex: 1 }}>
+            {editing
+              ? <TextInput autoFocus value={name} onChangeText={setName} onSubmitEditing={save} placeholder="Tu nombre" placeholderTextColor={colors.muted} selectionColor={colors.accent} style={s.nameInput} />
+              : <Text style={type.h2}>{user?.name}</Text>}
+            <Text style={type.small}>{user?.email}</Text>
+          </View>
+          <Press onPress={() => (editing ? save() : (setName(user?.name || ''), setEditing(true)))} hitSlop={10}><Text style={s.done}>{editing ? 'Guardar' : 'Editar'}</Text></Press>
         </View>
       </View>
 
@@ -44,10 +53,11 @@ export default function Profile() {
       <View style={s.group}><AppearancePicker /></View>
 
       <View style={s.group}>
-        <View style={s.switchRow}>
-          <View style={{ flex: 1 }}><Text style={type.h3}>Sin anuncios (demostración)</Text><Text style={type.small}>Activa o desactiva los anuncios propios de GrooveSpace.</Text></View>
-          <Switch value={premium} onValueChange={setPremium} trackColor={{ true: colors.accent, false: colors.track }} thumbColor="#fff" />
-        </View>
+        <Press onPress={() => router.push('/premium')} scale={0.99} style={s.switchRow}>
+          <Ionicons name={premium ? 'star' : 'star-outline'} size={22} color={colors.accent} />
+          <View style={{ flex: 1 }}><Text style={type.h3}>{premium ? 'GrooveSpace Premium activo' : 'Hazte Premium'}</Text><Text style={type.small}>Aprende a tocar canciones y escucha sin anuncios.</Text></View>
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </Press>
       </View>
 
       <Text style={s.cap}>CÓMO CUENTAN TUS REPRODUCCIONES</Text>
@@ -76,6 +86,7 @@ const Stat = ({ n, l, last }) => {
   );
 };
 const makeS = (colors, type) => StyleSheet.create({
+  nameInput: { color: colors.text, fontSize: 20, fontWeight: '700', paddingVertical: 2, borderBottomWidth: 1, borderBottomColor: colors.accent },
   done: { color: colors.accent, fontSize: 17, fontWeight: '600', marginBottom: 6 },
   group: { backgroundColor: colors.groupCard, borderRadius: 12, marginHorizontal: 16, marginTop: 16, overflow: 'hidden' },
   profile: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },

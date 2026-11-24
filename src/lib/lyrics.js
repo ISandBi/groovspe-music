@@ -31,6 +31,14 @@ export async function getLyrics(song, band) {
       if (data?.syncedLyrics) result = { synced: true, source: 'LRCLIB', lines: parseLrc(data.syncedLyrics) };
       else if (data?.plainLyrics) result = { synced: false, source: 'LRCLIB', lines: data.plainLyrics.split('\n').map((x) => x.trim()).filter(Boolean).map((text) => ({ t: 0, text })) };
     } catch (e) { result = null; }
+    if (!result) {
+      // Respaldo: lyrics.ovh (letra sin sincronía).
+      try {
+        const r = await fetch(`https://api.lyrics.ovh/v1/${enc(band.name)}/${enc(song.title)}`);
+        const d = r.ok ? await r.json() : null;
+        if (d?.lyrics) result = { synced: false, source: 'lyrics.ovh', lines: d.lyrics.split('\n').map((x) => x.trim()).filter(Boolean).map((text) => ({ t: 0, text })) };
+      } catch (e) { result = null; }
+    }
   }
   if (result && result.lines.length) cache.set(song.id, result); else result = null;
   return result;

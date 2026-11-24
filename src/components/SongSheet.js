@@ -14,7 +14,7 @@ const H = Dimensions.get('window').height;
 // Menú contextual de canción (estilo hoja de acciones): favorita, añadir a lista, cola, ir a la banda.
 export default function SongSheet() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { sheetSong, closeSheet, favorites, toggleFav, enqueueNext, playlists, addToPlaylist, createPlaylist } = useApp();
+  const { sheetSong, closeSheet, premium, favorites, toggleFav, enqueueNext, playlists, addToPlaylist, createPlaylist } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const y = useRef(new Animated.Value(H)).current;
@@ -56,6 +56,7 @@ export default function SongSheet() {
             <Item icon={fav ? 'heart' : 'heart-outline'} tint={fav ? colors.accent : undefined} label={fav ? 'Quitar de favoritas' : 'Añadir a favoritas'} onPress={() => { toggleFav(song.id); close(); }} />
             <Item icon="add-circle-outline" label="Añadir a una lista" onPress={() => setMode('lists')} />
             <Item icon="list" label="Añadir a la cola" onPress={() => { enqueueNext(song.id); close(); }} />
+            {!song.yt && <Item icon={premium ? 'school-outline' : 'lock-closed-outline'} tint={colors.violet} label={premium ? 'Aprender a tocar' : 'Aprender a tocar · Premium'} onPress={() => { close(); router.push(`/learn/${song.id}`); }} />}
             <Item icon="person-outline" label="Ir a la banda" onPress={() => { close(); router.push(`/band/${band.id}`); }} />
           </View>
         )}
