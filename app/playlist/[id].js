@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,11 +8,12 @@ import Press from '../../src/components/Press';
 import FadeIn from '../../src/components/FadeIn';
 import SongRow from '../../src/components/SongRow';
 import MiniPlayer from '../../src/components/MiniPlayer';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { songById } from '../../src/data';
 import { useApp } from '../../src/store';
 
 export default function PlaylistScreen() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { id } = useLocalSearchParams();
   const { getPlaylist, favorites, play, toggleShuffle, shuffle, deletePlaylist } = useApp();
   const router = useRouter();
@@ -65,7 +66,7 @@ export default function PlaylistScreen() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   bar: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 },
   round: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   favArt: { width: 250, height: 250, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

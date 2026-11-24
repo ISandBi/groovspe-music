@@ -3,10 +3,11 @@ import { Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
 import { Hairline } from './Header';
-import { colors, type } from '../theme';
+import { useTheme } from '../theme';
 
 // Sección con línea fina arriba y título con flecha (como "Hecho para ti ›").
 export default function Section({ title, onPress, children, style, divider = true }) {
+  const { colors, type } = useTheme();
   const head = (
     <>
       <Text style={type.h2}>{title}</Text>

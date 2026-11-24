@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { shadow } from '../theme';
+import { shadow, useTheme } from '../theme';
 
 // Carátula generada: degradado de la banda + iniciales. `elevated` añade la sombra suave tipo álbum.
 export default function Cover({ band, size = 56, radius = 10, style, seed = 0, elevated }) {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const n = typeof seed === 'number' ? seed : [...String(seed)].reduce((a, c) => a + c.charCodeAt(0), 0);
   const dirs = [[0, 0, 1, 1], [1, 0, 0, 1], [0, 1, 1, 0], [0.5, 0, 0.5, 1]];
   const d = dirs[n % 4];
@@ -19,7 +20,7 @@ export default function Cover({ band, size = 56, radius = 10, style, seed = 0, e
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   fill: { flex: 1, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(0,0,0,0.12)' },
   ring: { position: 'absolute', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.28)' },
   txt: { position: 'absolute', color: 'rgba(255,255,255,0.95)', fontWeight: '800', letterSpacing: -0.5 },

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
-import { colors } from '../theme';
+import { useTheme } from '../theme';
 
 // Anuncio propio de GrooveSpace (eventos, bandas nuevas, renta de salas). Solo versión gratuita.
 export default function AdCard({ ad, compact, dark }) {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   return (
     <Press scale={0.985} style={[s.card, dark && s.dark]} accessibilityRole="button" accessibilityLabel={`Anuncio: ${ad.title}`}>
       <LinearGradient colors={ad.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.thumb, compact && { width: 44, height: 44 }]}>
@@ -21,7 +22,7 @@ export default function AdCard({ ad, compact, dark }) {
     </Press>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.surface, borderRadius: 14, padding: 12 },
   dark: { backgroundColor: 'rgba(255,255,255,0.16)' },
   thumb: { width: 56, height: 56, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },

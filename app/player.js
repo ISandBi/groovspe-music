@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -8,14 +8,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Cover from '../src/components/Cover';
 import Press from '../src/components/Press';
 import AdCard from '../src/components/AdCard';
-import { colors, shadow } from '../src/theme';
+import Lyrics from '../src/components/Lyrics';
+import { shadow, useTheme } from '../src/theme';
 import { ADS } from '../src/data';
 import { clock } from '../src/lib/format';
 import { useApp } from '../src/store';
 
 // Reproductor "ahora suena": fondo dinámico con los colores de la banda, portada grande y controles blancos.
 export default function Player() {
-  const { current, band, status, toggle, step, seek, favorites, toggleFav, premium, adGate, user, isBand, shuffle, repeat, toggleShuffle, cycleRepeat, context, openSheet, isYt, videoMode, setMode, setVideoRect, openOnYoutube } = useApp();
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  const { current, band, status, toggle, step, seek, favorites, toggleFav, premium, adGate, user, isBand, shuffle, repeat, toggleShuffle, cycleRepeat, context, openSheet, isYt, videoMode, viewMode, setMode, setVideoRect, openOnYoutube } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -56,8 +58,8 @@ export default function Player() {
         <Pressable onPress={() => router.back()} hitSlop={20} style={s.grabWrap} accessibilityLabel="Cerrar reproductor"><View style={s.grab} /></Pressable>
 
         <View style={s.modes}>
-          {[['audio', 'Audio'], ['video', 'Video']].map(([m, label]) => {
-            const on = (m === 'video') === videoMode;
+          {[['lyrics', 'Letra'], ['cover', 'Portada'], ['video', 'Video']].map(([m, label]) => {
+            const on = m === viewMode;
             return (
               <Press key={m} onPress={() => setMode(m)} scale={0.96} style={[s.mode, on && s.modeOn, m === 'video' && !isYt && { opacity: 0.4 }]} accessibilityLabel={`Modo ${label}`}>
                 <Text style={[s.modeTxt, on && { color: '#1a1325' }]}>{label}</Text>
@@ -68,9 +70,13 @@ export default function Player() {
 
         <View style={{ alignItems: 'center', marginTop: 20 }}>
           <View ref={artRef} collapsable={false} style={{ width: art, height: art, alignItems: 'center', justifyContent: 'center' }}>
-            <Animated.View style={{ transform: [{ scale: videoMode ? 1 : scale }], opacity: videoMode && isYt ? 0 : 1 }}>
-              <Cover band={band} size={art} radius={14} seed={current.id} elevated />
-            </Animated.View>
+            {viewMode === 'lyrics' ? (
+              <Lyrics song={current} band={band} currentTime={elapsed} onSeek={seek} height={art} />
+            ) : (
+              <Animated.View style={{ transform: [{ scale: videoMode ? 1 : scale }], opacity: videoMode && isYt ? 0 : 1 }}>
+                <Cover band={band} size={art} radius={14} seed={current.id} elevated />
+              </Animated.View>
+            )}
           </View>
         </View>
         {status.error ? (
@@ -118,7 +124,7 @@ export default function Player() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   grabWrap: { alignSelf: 'center', paddingVertical: 8 },
   grab: { width: 40, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.45)' },
   modes: { flexDirection: 'row', alignSelf: 'center', marginTop: 6, padding: 3, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.2)' },

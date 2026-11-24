@@ -31,7 +31,9 @@ export function AppProvider({ children }) {
   const [repeat, setRepeat] = useState('off'); // off | all | one
   const [adGate, setAdGate] = useState(0);
   const [sheetSong, setSheetSong] = useState(null);
-  const [videoMode, setVideoMode] = useState(false);
+  const [viewMode, setViewMode] = useState('lyrics'); // lyrics | cover | video
+  const videoMode = viewMode === 'video';
+  const [themeMode, setThemeMode] = useState('system'); // system | light | dark
   const [videoRect, setVideoRect] = useState(null);
   const [ytId, setYtId] = useState(null);
   const [ytStatus, setYtStatus] = useState({ playing: false, currentTime: 0, duration: 0, didJustFinish: false, error: null });
@@ -49,7 +51,7 @@ export function AppProvider({ children }) {
           const s = JSON.parse(raw);
           setUser(s.user || null); setPremium(!!s.premium); setFavorites(s.favorites || []);
           setRecent(s.recent || []); setCredited(s.credited || {}); setPlays(s.plays || 0);
-          setPlaylists(s.playlists || []); setFollowed(s.followed || []);
+          setPlaylists(s.playlists || []); setFollowed(s.followed || []); setThemeMode(s.themeMode || 'system');
         }
       } catch (e) { /* sin datos previos */ }
       setReady(true);
@@ -58,8 +60,8 @@ export function AppProvider({ children }) {
   }, []);
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(KEY, JSON.stringify({ user, premium, favorites, recent, credited, plays, playlists, followed })).catch(() => {});
-  }, [ready, user, premium, favorites, recent, credited, plays, playlists, followed]);
+    AsyncStorage.setItem(KEY, JSON.stringify({ user, premium, favorites, recent, credited, plays, playlists, followed, themeMode })).catch(() => {});
+  }, [ready, user, premium, favorites, recent, credited, plays, playlists, followed, themeMode]);
 
   const showToast = useCallback((msg) => setToast({ msg, id: Date.now() }), []);
   const current = currentId ? songById(currentId) : null;
@@ -93,7 +95,7 @@ export function AppProvider({ children }) {
       if (ytId === song.yt) { ytCmd('seek', 0); ytCmd('play'); } else setYtId(song.yt);
       return;
     }
-    ytCmd('pause'); setVideoMode(false);
+    ytCmd('pause'); setViewMode((m) => (m === 'video' ? 'lyrics' : m));
     if (loaded.current !== songId) {
       player.replace({ uri: song.url });
       loaded.current = songId;
@@ -124,7 +126,7 @@ export function AppProvider({ children }) {
   const seek = useCallback((sec) => { if (isYt) return ytCmd('seek', sec); try { player.seekTo(sec); } catch (e) {} }, [player, isYt, ytCmd]);
   const setMode = useCallback((m) => {
     if (m === 'video' && !isYt) { showToast('Esta canción no tiene video'); return; }
-    tap(); setVideoMode(m === 'video');
+    tap(); setViewMode(m);
   }, [isYt, showToast]);
   const openOnYoutube = useCallback(() => { if (current?.yt) Linking.openURL(`https://www.youtube.com/watch?v=${current.yt}`); }, [current]);
   const cycleRepeat = useCallback(() => { tap(); setRepeat((r) => (r === 'off' ? 'all' : r === 'all' ? 'one' : 'off')); }, []);
@@ -187,8 +189,8 @@ export function AppProvider({ children }) {
     playlists, createPlaylist, addToPlaylist, removeFromPlaylist, deletePlaylist, getPlaylist,
     followed, toggleFollow, sheetSong, openSheet: setSheetSong, closeSheet: () => setSheetSong(null),
     logout: () => { setUser(null); try { player.pause(); } catch (e) {} ytCmd('pause'); },
-    isYt, videoMode, setMode, videoRect, setVideoRect, ytRef, ytId, onYtMessage, openOnYoutube,
-  }), [ready, user, isBand, premium, favorites, recent, plays, current, band, status, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, videoMode, videoRect, ytId]); // eslint-disable-line
+    isYt, videoMode, viewMode, themeMode, setThemeMode, setMode, videoRect, setVideoRect, ytRef, ytId, onYtMessage, openOnYoutube,
+  }), [ready, user, isBand, premium, favorites, recent, plays, current, band, status, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, viewMode, themeMode, videoRect, ytId]); // eslint-disable-line
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

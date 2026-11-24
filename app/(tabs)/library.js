@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +7,7 @@ import Press from '../../src/components/Press';
 import FadeIn from '../../src/components/FadeIn';
 import Header from '../../src/components/Header';
 import SongRow from '../../src/components/SongRow';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { PLAYLISTS as ALL_LISTS, BANDS, SONGS, bandById, songById } from '../../src/data';
 import { useApp } from '../../src/store';
 
@@ -15,6 +15,7 @@ const PLAYLISTS = [...ALL_LISTS].sort((a, b) => (b.id === 'e7') - (a.id === 'e7'
 const TOP = [...BANDS].sort((a, b) => b.listeners - a.listeners);
 
 export default function Library() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { favorites, playlists, followed, recent, createPlaylist } = useApp();
   const router = useRouter();
   const [view, setView] = useState(null); // null | listas | bandas | canciones
@@ -102,7 +103,7 @@ export default function Library() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   edit: { color: colors.accent, fontSize: 17, marginBottom: 6 },
   back: { flexDirection: 'row', alignItems: 'center', paddingLeft: 12 },
   rowPlain: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 20 },
@@ -113,7 +114,7 @@ const s = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, paddingHorizontal: 20 },
   gTitle: { fontSize: 14, fontWeight: '600', color: colors.text, marginTop: 8 },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
-  dialog: { position: 'absolute', left: 28, right: 28, top: '30%', backgroundColor: '#fff', borderRadius: 16, padding: 20, gap: 14 },
+  dialog: { position: 'absolute', left: 28, right: 28, top: '30%', backgroundColor: colors.raised, borderRadius: 16, padding: 20, gap: 14 },
   input: { backgroundColor: colors.surface, color: colors.text, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 17 },
   btn: { backgroundColor: colors.accent, borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
   btnTxt: { color: '#fff', fontWeight: '700', fontSize: 16 },

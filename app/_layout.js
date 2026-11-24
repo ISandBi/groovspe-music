@@ -7,14 +7,13 @@ import { AppProvider } from '../src/store';
 import Toast from '../src/components/Toast';
 import SongSheet from '../src/components/SongSheet';
 import YouTubeEngine from '../src/components/YouTubeEngine';
-import { colors } from '../src/theme';
+import { useTheme } from '../src/theme';
 
-export default function RootLayout() {
+function Shell() {
+  const { colors, dark } = useTheme();
   return (
-    <SafeAreaProvider>
-      <AppProvider>
         <View style={{ flex: 1, backgroundColor: colors.bg }}>
-          <StatusBar style="dark" />
+          <StatusBar style={dark ? 'light' : 'dark'} />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'fade' }}>
             <Stack.Screen name="queue" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="playlist/[id]" options={{ animation: 'slide_from_right' }} />
@@ -26,6 +25,14 @@ export default function RootLayout() {
           <SongSheet />
           <Toast />
         </View>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <AppProvider>
+        <Shell />
       </AppProvider>
     </SafeAreaProvider>
   );

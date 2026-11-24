@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Press from '../../src/components/Press';
 import Header from '../../src/components/Header';
-import { colors, type } from '../../src/theme';
+import AppearancePicker from '../../src/components/AppearancePicker';
+import { useTheme } from '../../src/theme';
 import { RULES } from '../../src/data';
 import { useApp } from '../../src/store';
 
 export default function Profile() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { user, premium, setPremium, plays, favorites, logout } = useApp();
   const router = useRouter();
   const initial = (user?.name || '?')[0].toUpperCase();
@@ -21,8 +23,8 @@ export default function Profile() {
     `La banda puede usarlo hasta en el ${RULES.maxBookingShare * 100} % de una reserva de salas, equipo o ingeniero.`,
   ];
   return (
-    <ScrollView style={{ backgroundColor: colors.surface }} contentContainerStyle={{ paddingBottom: 190 }} showsVerticalScrollIndicator={false}>
-      <View style={{ backgroundColor: colors.surface }}>
+    <ScrollView style={{ backgroundColor: colors.groupBg }} contentContainerStyle={{ paddingBottom: 190 }} showsVerticalScrollIndicator={false}>
+      <View style={{ backgroundColor: colors.groupBg }}>
         <Header title="Cuenta" right={<Press onPress={() => router.back()} hitSlop={10}><Text style={s.done}>Listo</Text></Press>} />
       </View>
 
@@ -39,10 +41,12 @@ export default function Profile() {
         <Stat n={favorites.length} l="Canciones favoritas" last />
       </View>
 
+      <View style={s.group}><AppearancePicker /></View>
+
       <View style={s.group}>
         <View style={s.switchRow}>
           <View style={{ flex: 1 }}><Text style={type.h3}>Sin anuncios (demostración)</Text><Text style={type.small}>Activa o desactiva los anuncios propios de GrooveSpace.</Text></View>
-          <Switch value={premium} onValueChange={setPremium} trackColor={{ true: colors.accent, false: '#d9d4e0' }} thumbColor="#fff" />
+          <Switch value={premium} onValueChange={setPremium} trackColor={{ true: colors.accent, false: colors.track }} thumbColor="#fff" />
         </View>
       </View>
 
@@ -63,14 +67,17 @@ export default function Profile() {
     </ScrollView>
   );
 }
-const Stat = ({ n, l, last }) => (
+const Stat = ({ n, l, last }) => {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  return (
   <View style={[s.stat, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }]}>
     <Text style={type.h3}>{l}</Text><Text style={[type.h3, { color: colors.muted, fontWeight: '400' }]}>{n}</Text>
   </View>
-);
-const s = StyleSheet.create({
+  );
+};
+const makeS = (colors, type) => StyleSheet.create({
   done: { color: colors.accent, fontSize: 17, fontWeight: '600', marginBottom: 6 },
-  group: { backgroundColor: '#fff', borderRadius: 12, marginHorizontal: 16, marginTop: 16, overflow: 'hidden' },
+  group: { backgroundColor: colors.groupCard, borderRadius: 12, marginHorizontal: 16, marginTop: 16, overflow: 'hidden' },
   profile: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
   avatar: { width: 60, height: 60, borderRadius: 30, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
   avatarTxt: { color: '#fff', fontSize: 26, fontWeight: '800' },

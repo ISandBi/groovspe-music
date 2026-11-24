@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FadeIn from '../../src/components/FadeIn';
 import Press from '../../src/components/Press';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { useApp } from '../../src/store';
 import { bandFetch } from '../../src/lib/api';
 
 export default function BandPanel() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { user, plays, setUser } = useApp();
   const insets = useSafeAreaInsets();
   const [demos, setDemos] = useState([]);
@@ -67,14 +68,17 @@ export default function BandPanel() {
     </ScrollView>
   );
 }
-const Metric = ({ icon, label, value }) => (
+const Metric = ({ icon, label, value }) => {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  return (
   <View style={s.metric}>
     <Ionicons name={icon} size={18} color={colors.pink} />
     <Text style={[type.h1, { fontSize: 22, marginTop: 8 }]}>{value}</Text>
     <Text style={type.small}>{label}</Text>
   </View>
-);
-const s = StyleSheet.create({
+  );
+};
+const makeS = (colors, type) => StyleSheet.create({
   hero: { borderRadius: 24, padding: 22, marginTop: 20 },
   heroTag: { color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: '800', letterSpacing: 1.2 },
   heroNum: { color: '#fff', fontSize: 44, fontWeight: '900', letterSpacing: -1.5, marginTop: 4 },

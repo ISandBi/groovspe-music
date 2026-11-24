@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View, ActivityIndicator } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Press from '../src/components/Press';
 import FadeIn from '../src/components/FadeIn';
-import { colors, type } from '../src/theme';
+import { useTheme } from '../src/theme';
 import { useApp } from '../src/store';
 import { loginBand } from '../src/lib/api';
 
 export default function Auth() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { mode: m } = useLocalSearchParams();
   const [mode, setMode] = useState(m === 'login' ? 'login' : 'register');
   const [name, setName] = useState('');
@@ -43,42 +45,61 @@ export default function Auth() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={{ padding: 24, paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }} keyboardShouldPersistTaps="handled">
-        <Press onPress={() => router.back()} style={s.back} accessibilityLabel="Volver"><Ionicons name="chevron-back" size={24} color={colors.accent} /><Text style={{ color: colors.accent, fontSize: 17 }}>Atrás</Text></Press>
-        <FadeIn><Text style={[type.h1, { marginTop: 24 }]}>{reg ? 'Crea tu cuenta de oyente' : 'Bienvenido de vuelta'}</Text></FadeIn>
-        <FadeIn delay={100}><Text style={[type.body, { marginTop: 8 }]}>{reg ? 'Registrarte hace que tus reproducciones válidas cuenten para las bandas. Si tu banda ya está en GrooveSpace, usa su mismo correo y contraseña.' : 'Entra con tu cuenta de GrooveSpace. Si eres banda, verás tu panel de banda.'}</Text></FadeIn>
-        <FadeIn delay={200} style={{ marginTop: 28, gap: 14 }}>
-          <View style={s.group}>
-            {reg && <Field label="Nombre" value={name} onChangeText={setName} placeholder="Nombre" autoCapitalize="words" />}
-            <Field label="Correo" value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" autoCapitalize="none" />
-            <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder="Contraseña (mínimo 6)" secureTextEntry last />
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <View style={{ paddingTop: insets.top + 6, paddingHorizontal: 10 }}>
+        <Pressable onPress={() => router.back()} hitSlop={12} style={s.back} accessibilityLabel="Volver">
+          <Ionicons name="chevron-back" size={26} color={colors.accent} />
+          <Text style={s.backTxt}>Atrás</Text>
+        </Pressable>
+      </View>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: insets.bottom + 24 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={s.card}>
+            <FadeIn style={{ alignItems: 'center' }}>
+              <LinearGradient colors={['#ff4f8b', '#8b5cff']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.icon}><Ionicons name="musical-notes" size={32} color="#fff" /></LinearGradient>
+              <Text style={s.title}>{reg ? 'Crea tu cuenta' : 'Bienvenido de vuelta'}</Text>
+              <Text style={s.sub}>{reg ? 'Tus reproducciones válidas cuentan para las bandas. Si tu banda ya está en GrooveSpace, entra con su mismo correo y contraseña.' : 'Entra con tu cuenta de GrooveSpace. Si eres banda, verás tu panel de banda.'}</Text>
+            </FadeIn>
+            <FadeIn delay={150} style={{ marginTop: 26, gap: 14 }}>
+              <View style={s.group}>
+                {reg && <Field label="Nombre" value={name} onChangeText={setName} placeholder="Nombre" autoCapitalize="words" />}
+                <Field label="Correo" value={email} onChangeText={setEmail} placeholder="Correo electrónico" keyboardType="email-address" autoCapitalize="none" />
+                <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder="Contraseña (mínimo 6)" secureTextEntry last />
+              </View>
+              {!!error && <Text style={s.error}>{error}</Text>}
+              <Press onPress={busy ? undefined : submit} style={[s.primary, busy && { opacity: 0.7 }]}>
+                {busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryTxt}>{reg ? 'Registrarme' : 'Entrar'}</Text>}
+              </Press>
+              <Press onPress={() => { setError(''); setMode(reg ? 'login' : 'register'); }} style={{ alignItems: 'center', padding: 6 }}>
+                <Text style={{ color: colors.muted, fontSize: 15 }}>{reg ? '¿Ya tienes cuenta? ' : '¿Aún no tienes cuenta? '}<Text style={{ color: colors.accent, fontWeight: '600' }}>{reg ? 'Entrar' : 'Registrarme'}</Text></Text>
+              </Press>
+            </FadeIn>
+            {reg && <Text style={[type.small, { marginTop: 18, textAlign: 'center' }]}>Al registrarte aceptas los Términos y el Aviso de Privacidad de GrooveSpace.</Text>}
           </View>
-          {!!error && <Text style={{ color: colors.accent, fontWeight: '600' }}>{error}</Text>}
-          <Press onPress={busy ? undefined : submit} style={[s.primary, busy && { opacity: 0.7 }]}>
-            {busy ? <ActivityIndicator color="#fff" /> : <Text style={s.primaryTxt}>{reg ? 'Registrarme' : 'Entrar'}</Text>}
-          </Press>
-          <Press onPress={() => { setError(''); setMode(reg ? 'login' : 'register'); }} style={{ alignItems: 'center', padding: 8 }}>
-            <Text style={{ color: colors.muted }}>{reg ? '¿Ya tienes cuenta? ' : '¿Aún no tienes cuenta? '}<Text style={{ color: colors.accent, fontWeight: '600' }}>{reg ? 'Entrar' : 'Registrarme'}</Text></Text>
-          </Press>
-        </FadeIn>
-        {reg && <Text style={[type.small, { marginTop: 20, textAlign: 'center' }]}>Al registrarte aceptas los Términos y el Aviso de Privacidad de GrooveSpace.</Text>}
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
-}
-function Field({ label, last, ...p }) {
-  return (
-    <View style={[s.field, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }]}>
-      <TextInput {...p} accessibilityLabel={label} placeholderTextColor={colors.muted} style={s.input} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
-const s = StyleSheet.create({
-  back: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start' },
+function Field({ label, last, ...p }) {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  return (
+    <View style={[s.field, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line }]}>
+      <TextInput {...p} accessibilityLabel={label} placeholderTextColor={colors.muted} selectionColor={colors.accent} style={s.input} />
+    </View>
+  );
+}
+const makeS = (colors, type) => StyleSheet.create({
+  back: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', paddingVertical: 6 },
+  backTxt: { color: colors.accent, fontSize: 17 },
+  card: { width: '100%', maxWidth: 440, alignSelf: 'center' },
+  icon: { width: 68, height: 68, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 30, fontWeight: '800', color: colors.text, textAlign: 'center', letterSpacing: -0.7, marginTop: 16 },
+  sub: { fontSize: 15, lineHeight: 22, color: colors.muted, textAlign: 'center', marginTop: 8 },
   group: { backgroundColor: colors.surface, borderRadius: 12, overflow: 'hidden' },
   field: { paddingHorizontal: 16 },
   input: { color: colors.text, fontSize: 17, paddingVertical: 14 },
-  primary: { backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 6 },
+  error: { color: colors.accent, fontWeight: '600', textAlign: 'center' },
+  primary: { backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
   primaryTxt: { color: '#fff', fontWeight: '700', fontSize: 17 },
 });

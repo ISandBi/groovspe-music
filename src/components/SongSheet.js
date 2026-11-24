@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Animated, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Cover from './Cover';
 import Press from './Press';
-import { colors } from '../theme';
+import { useTheme } from '../theme';
 import { bandById, songById } from '../data';
 import { useApp } from '../store';
 
@@ -13,6 +13,7 @@ const H = Dimensions.get('window').height;
 
 // Menú contextual de canción (estilo hoja de acciones): favorita, añadir a lista, cola, ir a la banda.
 export default function SongSheet() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { sheetSong, closeSheet, favorites, toggleFav, enqueueNext, playlists, addToPlaylist, createPlaylist } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -74,7 +75,7 @@ export default function SongSheet() {
     </Modal>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)' },
   sheet: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#fff', borderTopLeftRadius: 16, borderTopRightRadius: 16, paddingTop: 8 },
   grab: { alignSelf: 'center', width: 36, height: 5, borderRadius: 3, backgroundColor: 'rgba(26,19,37,0.2)', marginBottom: 12 },

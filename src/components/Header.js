@@ -1,10 +1,11 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, type } from '../theme';
+import { useTheme } from '../theme';
 
 // Encabezado de título grande (estilo Apple). `right` = botón o avatar a la derecha.
 export default function Header({ title, right, caption }) {
+  const { type } = useTheme();
   const insets = useSafeAreaInsets();
   return (
     <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 20, paddingBottom: 8, flexDirection: 'row', alignItems: 'flex-end' }}>
@@ -16,4 +17,4 @@ export default function Header({ title, right, caption }) {
     </View>
   );
 }
-export const Hairline = ({ style }) => <View style={[{ height: 0.5, backgroundColor: colors.line }, style]} />;
+export const Hairline = ({ style }) => { const { colors } = useTheme(); return <View style={[{ height: 0.5, backgroundColor: colors.line }, style]} />; };

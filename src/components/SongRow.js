@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Press from './Press';
 import Cover from './Cover';
 import EqBars from './EqBars';
-import { colors } from '../theme';
+import { useTheme } from '../theme';
 import { bandById } from '../data';
 import { clock, compact } from '../lib/format';
 import { useApp } from '../store';
 
 // Fila de canción con separador fino que empieza en el texto (estilo Apple).
 export default function SongRow({ song, list, index, context, showPlays = true }) {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { current, status, play, openSheet } = useApp();
   const band = bandById(song.bandId);
   const active = current?.id === song.id;
@@ -33,7 +34,7 @@ export default function SongRow({ song, list, index, context, showPlays = true }
     </Press>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 0 },
   idxBox: { width: 20, alignItems: 'center' },
   idx: { color: colors.muted, fontWeight: '600', fontSize: 15 },

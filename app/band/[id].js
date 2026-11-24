@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,12 +8,13 @@ import Press from '../../src/components/Press';
 import FadeIn from '../../src/components/FadeIn';
 import SongRow from '../../src/components/SongRow';
 import MiniPlayer from '../../src/components/MiniPlayer';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { bandById, songsOfBand } from '../../src/data';
 import { compact } from '../../src/lib/format';
 import { useApp } from '../../src/store';
 
 export default function BandScreen() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { id } = useLocalSearchParams();
   const band = bandById(id);
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function BandScreen() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   round: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'center', justifyContent: 'center' },
   follow: { backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999 },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Press from '../src/components/Press';
 import FadeIn from '../src/components/FadeIn';
-import { colors, shadow } from '../src/theme';
+import { shadow, useTheme } from '../src/theme';
 
 const FEATURES = [
   ['people', 'Bandas de la escena', 'Escucha música grabada por bandas en las salas y estudios de GrooveSpace.'],
@@ -15,11 +15,12 @@ const FEATURES = [
 ];
 
 export default function Welcome() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <LinearGradient colors={['rgba(240,69,127,0.16)', 'rgba(139,92,255,0.07)', 'rgba(255,255,255,0)']} style={[StyleSheet.absoluteFill, { height: 380 }]} />
+      <LinearGradient colors={['rgba(240,69,127,0.16)', 'rgba(139,92,255,0.07)', 'rgba(139,92,255,0)']} style={[StyleSheet.absoluteFill, { height: 380 }]} />
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + 56, paddingHorizontal: 28, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         <FadeIn style={{ alignItems: 'center' }}>
           <LinearGradient colors={['#ff4f8b', '#8b5cff']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.icon, shadow]}>
@@ -43,7 +44,7 @@ export default function Welcome() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   icon: { width: 96, height: 96, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 34, fontWeight: '800', textAlign: 'center', color: colors.text, letterSpacing: -0.8, marginTop: 24, lineHeight: 40 },
   feature: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },

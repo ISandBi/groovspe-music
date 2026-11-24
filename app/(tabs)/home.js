@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,7 +10,7 @@ import SongRow from '../../src/components/SongRow';
 import AdCard from '../../src/components/AdCard';
 import Card, { FeatureCard } from '../../src/components/Card';
 import Shelf from '../../src/components/Shelf';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { ADS, BANDS, PLAYLISTS as ALL_LISTS, SONGS, bandById, songById } from '../../src/data';
 import { useApp } from '../../src/store';
 
@@ -20,6 +20,7 @@ const OWN = SONGS.filter((x) => !x.yt);
 const dateLabel = () => new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
 
 export default function Home() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { user, premium, plays, recent, play } = useApp();
   const router = useRouter();
   const top = [...SONGS].sort((a, b) => b.plays - a.plays);
@@ -97,7 +98,7 @@ export default function Home() {
     </ScrollView>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   avatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   avatarTxt: { color: '#fff', fontWeight: '800', fontSize: 16 },
   impact: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 20, backgroundColor: colors.surface, borderRadius: 14, padding: 14 },

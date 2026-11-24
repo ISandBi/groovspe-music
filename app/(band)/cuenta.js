@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FadeIn from '../../src/components/FadeIn';
 import Press from '../../src/components/Press';
-import { colors, type } from '../../src/theme';
+import AppearancePicker from '../../src/components/AppearancePicker';
+import { useTheme } from '../../src/theme';
 import { useApp } from '../../src/store';
 
 export default function Cuenta() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { user, setUser } = useApp();
   const insets = useSafeAreaInsets();
   return (
@@ -23,6 +25,7 @@ export default function Cuenta() {
       <FadeIn delay={200} style={{ marginTop: 16 }}>
         <Text style={[type.body, { fontSize: 13 }]}>Para editar integrantes, contratos o pagos, usa el sitio de GrooveSpace con la misma cuenta.</Text>
       </FadeIn>
+      <View style={{ marginTop: 20, backgroundColor: colors.surface, borderRadius: 12 }}><AppearancePicker /></View>
       <Press onPress={() => setUser(null)} style={s.logout}>
         <Ionicons name="log-out-outline" size={18} color={colors.pink} />
         <Text style={{ color: colors.pink, fontWeight: '700' }}>Cerrar sesión</Text>
@@ -30,7 +33,9 @@ export default function Cuenta() {
     </ScrollView>
   );
 }
-const Row = ({ icon, label, value }) => (
+const Row = ({ icon, label, value }) => {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
+  return (
   <View style={s.row}>
     <Ionicons name={icon} size={18} color={colors.pink} />
     <View style={{ flex: 1 }}>
@@ -38,8 +43,9 @@ const Row = ({ icon, label, value }) => (
       <Text style={type.h3}>{value || '—'}</Text>
     </View>
   </View>
-);
-const s = StyleSheet.create({
+  );
+};
+const makeS = (colors, type) => StyleSheet.create({
   card: { backgroundColor: colors.surface, borderRadius: 20, padding: 6, marginTop: 20, borderWidth: 1, borderColor: colors.line },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
   logout: { flexDirection: 'row', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 999, borderWidth: 1, borderColor: 'rgba(255,93,143,0.4)', marginTop: 28 },

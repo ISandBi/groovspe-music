@@ -3,12 +3,13 @@ import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, TAB_HEIGHT } from '../../src/theme';
+import { TAB_HEIGHT, useTheme } from '../../src/theme';
 
 // Interfaz de banda: distinta a la del oyente (panel de gestión, demos y cuenta de la banda).
 const icon = (on, off) => ({ color, focused }) => <Ionicons name={focused ? on : off} size={24} color={color} />;
 
 export default function BandLayout() {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const barH = TAB_HEIGHT + insets.bottom;
   return (
@@ -17,7 +18,7 @@ export default function BandLayout() {
       tabBarActiveTintColor: colors.accent,
       tabBarInactiveTintColor: colors.muted,
       tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
-      tabBarStyle: { backgroundColor: '#fff', borderTopColor: colors.line, borderTopWidth: StyleSheet.hairlineWidth, height: barH, paddingTop: 6, paddingBottom: insets.bottom + 2 },
+      tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.line, borderTopWidth: StyleSheet.hairlineWidth, height: barH, paddingTop: 6, paddingBottom: insets.bottom + 2 },
       sceneStyle: { backgroundColor: colors.bg },
     }}>
       <Tabs.Screen name="panel" options={{ title: 'Panel', tabBarIcon: icon('grid', 'grid-outline') }} />

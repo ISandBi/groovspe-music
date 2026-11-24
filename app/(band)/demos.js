@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FadeIn from '../../src/components/FadeIn';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { useApp } from '../../src/store';
 import { bandFetch } from '../../src/lib/api';
 
 export default function Demos() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { user } = useApp();
   const insets = useSafeAreaInsets();
   const [items, setItems] = useState([]);
@@ -34,7 +35,7 @@ export default function Demos() {
     />
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   card: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: colors.surface, borderRadius: 18, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: colors.line },
   icon: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.pink, alignItems: 'center', justifyContent: 'center' },
 });

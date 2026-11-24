@@ -8,7 +8,7 @@ import Press from '../../src/components/Press';
 import FadeIn from '../../src/components/FadeIn';
 import Header from '../../src/components/Header';
 import SongRow from '../../src/components/SongRow';
-import { colors, type } from '../../src/theme';
+import { useTheme } from '../../src/theme';
 import { BANDS, GENRES, SONGS, bandById } from '../../src/data';
 
 // Categorías con degradados sobrios de la paleta GrooveSpace.
@@ -18,6 +18,7 @@ const TILE = [
 ];
 
 export default function Search() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const [q, setQ] = useState('');
   const [genre, setGenre] = useState(null);
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function Search() {
     </ScrollView>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 20, marginTop: 6, backgroundColor: colors.surface, borderRadius: 10, paddingHorizontal: 10 },
   input: { flex: 1, color: colors.text, fontSize: 17, paddingVertical: 10 },
   tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },

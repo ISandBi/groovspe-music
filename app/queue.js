@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Press from '../src/components/Press';
 import SongRow from '../src/components/SongRow';
-import { colors, type } from '../src/theme';
+import { useTheme } from '../src/theme';
 import { songById } from '../src/data';
 import { useApp } from '../src/store';
 
 export default function Queue() {
+  const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const { queue, current, context, shuffle, repeat, toggleShuffle, cycleRepeat } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -36,7 +37,7 @@ export default function Queue() {
     </View>
   );
 }
-const s = StyleSheet.create({
+const makeS = (colors, type) => StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   close: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   toggles: { flexDirection: 'row', gap: 10, marginTop: 14 },
