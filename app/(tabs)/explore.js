@@ -10,6 +10,7 @@ import Header from '../../src/components/Header';
 import SongRow from '../../src/components/SongRow';
 import { useTheme } from '../../src/theme';
 import { BANDS, GENRES, SONGS, bandById } from '../../src/data';
+import { useApp } from '../../src/store';
 
 // Categorías con degradados sobrios de la paleta GrooveSpace.
 const TILE = [
@@ -25,9 +26,11 @@ export default function Search() {
   const term = q.trim().toLowerCase();
   const browsing = !term && !genre;
 
-  const bands = useMemo(() => BANDS.filter((b) => (!genre || b.genre === genre) && (!term || b.name.toLowerCase().includes(term) || b.genre.toLowerCase().includes(term))), [genre, term]);
-  const songs = useMemo(() => SONGS.filter((s) => { const b = bandById(s.bandId); return (!genre || b.genre === genre) && (!term || s.title.toLowerCase().includes(term) || b.name.toLowerCase().includes(term)); }), [genre, term]);
-  const genres = GENRES.filter((g) => g !== 'Todo');
+  const { catalogVersion } = useApp();
+  // Se recalcula en cada render (y cuando cambia catalogVersion): el catálogo llega del sitio web después de abrir la app.
+  const bands = useMemo(() => BANDS.filter((b) => (!genre || b.genre === genre) && (!term || b.name.toLowerCase().includes(term) || b.genre.toLowerCase().includes(term))), [genre, term, catalogVersion]);
+  const songs = useMemo(() => SONGS.filter((s) => { const b = bandById(s.bandId); return (!genre || b.genre === genre) && (!term || s.title.toLowerCase().includes(term) || b.name.toLowerCase().includes(term)); }), [genre, term, catalogVersion]);
+  const genres = useMemo(() => GENRES.filter((g) => g !== 'Todo'), [catalogVersion]);
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 190 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>

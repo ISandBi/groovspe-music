@@ -8,7 +8,8 @@ import Press from '../src/components/Press';
 import FadeIn from '../src/components/FadeIn';
 import { useTheme } from '../src/theme';
 import { useApp } from '../src/store';
-import { loginBand } from '../src/lib/api';
+import { loginBand, loginListener, registerListener } from '../src/lib/api';
+import { API_URL } from '../src/lib/config';
 
 export default function Auth() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
@@ -21,7 +22,7 @@ export default function Auth() {
   const [pass, setPass] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const { setUser } = useApp();
+  const { setUser, startTour } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const reg = mode === 'register';
@@ -29,7 +30,7 @@ export default function Auth() {
   const submit = async () => {
     if (reg && name.trim().length < 2) return setError('Escribe tu nombre.');
     if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Escribe un correo válido.');
-    if (pass.length < 6) return setError('La contraseña necesita al menos 6 caracteres.');
+    if (pass.length < 8) return setError('La contraseña necesita al menos 8 caracteres.');
     setError(''); setBusy(true);
     try {
       // 1) Si el correo y la contraseña son de una banda registrada en GrooveSpace, entra como banda.
@@ -38,8 +39,14 @@ export default function Auth() {
         setUser({ role: 'band', name: band.band.leaderName || band.band.name, bandName: band.band.bandName || band.band.name, bandId: band.band._id, logoPath: band.band.logoPath, email, token: band.accessToken });
         return router.replace('/(band)/panel');
       }
-      // 2) Si no es banda, es oyente.
-      setUser({ role: 'listener', name: reg ? name.trim() : email.split('@')[0], email });
+      // 2) Si no es banda, es oyente. Con backend, la cuenta vive en el sitio de GrooveSpace.
+      let listener = { name: reg ? name.trim() : email.split('@')[0], email, token: undefined };
+      if (API_URL) {
+        const r = reg ? await registerListener(name.trim(), email.trim().toLowerCase(), pass) : await loginListener(email.trim().toLowerCase(), pass);
+        listener = { name: r.listener.name, email: r.listener.email, token: r.token };
+      }
+      setUser({ role: 'listener', ...listener });
+      if (reg) startTour(); // recorrido guiado sólo la primera vez, al registrarse
       router.replace('/(tabs)/home');
     } catch (e) {
       setError(e.message || 'No se pudo conectar con GrooveSpace. Revisa tu conexión.');
@@ -77,7 +84,7 @@ export default function Auth() {
                     ))}
                   </ScrollView>
                 </View>
-                <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder={reg ? 'Contraseña (mínimo 6)' : 'Contraseña'} password autoComplete="password" last />
+                <Field label="Contraseña" value={pass} onChangeText={setPass} placeholder={reg ? 'Contraseña (mínimo 8)' : 'Contraseña'} password autoComplete="password" last />
               </View>
               {!!error && <Text style={s.error}>{error}</Text>}
               <Press onPress={busy ? undefined : submit} style={[s.primary, busy && { opacity: 0.7 }]}>

@@ -6,7 +6,13 @@ Hecha con **React Native + Expo (Expo Router)**. Proyecto académico.
 
 ## Funciones
 
-Inicio con accesos rápidos y estanterías, buscador con tiles por género, biblioteca (listas propias, favoritas, bandas que sigues), listas editoriales de GrooveSpace, perfil de banda con *Seguir*, cola, aleatorio, repetir (todo/una), menú “⋯” por canción (favorita, añadir a lista, añadir a la cola), reproductor con fondo degradado según la banda y mini-reproductor. Interfaz separada para cuentas de banda.
+Inicio con accesos rápidos y estanterías, buscador con tiles por género, biblioteca (listas propias, favoritas, bandas que sigues), listas editoriales de GrooveSpace, perfil de banda con *Seguir*, cola, aleatorio, repetir (todo/una), menú “⋯” por canción (favorita, añadir a lista, añadir a la cola), reproductor con fondo degradado según la banda y mini-reproductor. Interfaz separada para cuentas de banda. Recorrido guiado la primera vez que te registras (se puede repetir desde Cuenta).
+
+## Catálogo en vivo desde el sitio web
+
+Con `EXPO_PUBLIC_API_URL` configurado, la app trae del sitio web de GrooveSpace **todas las bandas registradas** (nombre, logo, género, ciudad) y los **demos que cada banda haya marcado como publicados**, con su letra. Las bandas publican un demo y editan su letra desde el sitio web (pestaña Demos) o desde la propia app (panel de banda → Demos). Sin `EXPO_PUBLIC_API_URL` la app usa datos de muestra para poder probarse sin backend.
+
+Límite a tener en cuenta: el servidor sólo puede verificar que una reproducción duró ≥30 s por la diferencia entre el momento en que se abre y se cierra; no mide reproducción real de audio.
 
 ## Contenido provisional (audio y video)
 
@@ -42,8 +48,10 @@ npx expo start
 ## Cuentas de banda y de oyente
 
 - Entra con el **mismo correo y contraseña** que usaste para registrar tu banda en el sitio de GrooveSpace: la app te muestra el **panel de banda** (demos, cuenta).
-- Cualquier otra cuenta es de **oyente**. Para que la app hable con tu backend, define la URL en `.env` (no `localhost`):
-  `EXPO_PUBLIC_API_URL=http://192.168.1.86:4000` (usa la IP de tu computadora y el puerto de tu backend), y reinicia con `npx expo start -c`.
+- Cualquier otra cuenta es de **oyente**: se registra y guarda su sesión en el mismo backend del sitio web (no es una cuenta local del teléfono).
+- Para que la app hable con tu backend, define la URL en `.env` (no `localhost`):
+  `EXPO_PUBLIC_API_URL=http://192.168.1.86:5000` (usa la IP de tu computadora y el puerto de tu backend), y reinicia con `npx expo start -c`.
+- El backend debe aceptar conexiones de la red local: inícialo con `HOST=0.0.0.0 npm start` (ver el `.env.example` de `groovespace-backend`). Con `localhost`/`127.0.0.1` el teléfono no puede conectarse aunque esté en el mismo Wi-Fi.
 
 ## Pantalla de bloqueo y audio en segundo plano
 
