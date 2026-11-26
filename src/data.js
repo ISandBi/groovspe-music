@@ -1,8 +1,10 @@
-// Datos de demostración. Sustituir por la API de GrooveSpace (ver src/lib/api.js).
+// Catálogo en memoria. Con EXPO_PUBLIC_API_URL se llena desde el sitio web de GrooveSpace (setCatalog);
+// sin ella se usan los datos de demostración de abajo.
+import { API_URL } from './lib/config';
 const SAMPLE = (n) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`;
 const G = { brand: ['#ff4f8b', '#8b5cff'], lime: ['#5fd6a4', '#0f8f6b'], sunset: ['#ffb347', '#ff4f8b'], ocean: ['#38bdf8', '#4f46e5'], aurora: ['#8b5cff', '#2fd6c8'], night: ['#6366f1', '#1e1b4b'] };
 
-export const BANDS = [
+const SEED_BANDS = [
   // Bandas de GrooveSpace (grabadas por ingenieros de la plataforma).
   { id: 'b1', name: 'Neón Pantera', genre: 'Rock alternativo', city: 'Coyoacán, CDMX', colors: G.brand, listeners: 12840, bio: 'Cuatro amigos, una sala de ensayo y mucho reverb. Grabaron su primer EP en la Sala Pulso de GrooveSpace con ingeniería de Diego R.', engineer: 'Diego R.', recorded: 'Sala Pulso' },
   { id: 'b2', name: 'Ceiba Sonora', genre: 'Folk / Indie', city: 'Roma Norte, CDMX', colors: G.lime, listeners: 8310, bio: 'Folk urbano con guitarras acústicas y percusión de objetos cotidianos. Sesión en vivo multitrack incluida.', engineer: 'Marian L.', recorded: 'Sala Bosque' },
@@ -26,7 +28,7 @@ const t = (id, band, title, n, duration, plays) => ({ id, bandId: band, title, u
 // yt = ID de video oficial de YouTube (audio + video incrustado). Provisional.
 const y = (id, band, title, yt, duration, plays) => ({ id, bandId: band, title, yt, duration, plays, provisional: true });
 
-export const SONGS = [
+const SEED_SONGS = [
   t('s1', 'b1', 'Luces de Sodio', 1, 372, 9210),
   t('s2', 'b1', 'Fuego Lento', 2, 421, 7040),
   t('s3', 'b2', 'Raíces de Agua', 3, 342, 5120),
@@ -51,31 +53,31 @@ export const SONGS = [
 ];
 
 // Anuncios propios de GrooveSpace (versión gratuita).
-export const ADS = [
+const SEED_ADS = [
   { id: 'a1', kicker: 'EVENTO', title: 'Noche de Bandas Nuevas', text: 'Viernes 21:00 · 4 bandas de GrooveSpace en vivo.', cta: 'Ver cartel', colors: ['#ff4f8b', '#8b5cff'] },
   { id: 'a2', kicker: 'RENTA DE SALAS', title: 'Ensaya desde $220/h', text: 'Salas equipadas con consola y backline.', cta: 'Reservar', colors: ['#c8ff3d', '#12c28a'] },
   { id: 'a3', kicker: 'NUEVAS BANDAS', title: 'Descubre a Vidrio Líquido', text: 'Electrónica grabada en Estudio Cristal.', cta: 'Escuchar', colors: ['#b28aff', '#2cd5c4'] },
 ];
 
 // Listas editoriales de GrooveSpace (solo lectura).
-export const PLAYLISTS = [
+const SEED_PLAYLISTS = [
   { id: 'e1', name: 'Noches de CDMX', desc: 'Guitarras, neón y madrugada en la ciudad.', colors: ['#ff4f8b', '#8b5cff'], songIds: ['s1', 's5', 's9', 's10', 's3'] },
   { id: 'e2', name: 'Para bailar', desc: 'Cumbia psicodélica y groove sin parar.', colors: ['#ffb84d', '#e0302f'], songIds: ['s7', 's8', 's2', 's9'] },
   { id: 'e3', name: 'Folk de sala', desc: 'Acústico grabado en vivo, sin filtros.', colors: ['#c8ff3d', '#12c28a'], songIds: ['s3', 's4', 's2'] },
   { id: 'e4', name: 'Ruido pesado', desc: 'Compases impares y mucha distorsión.', colors: ['#9aa0ff', '#2b1d4d'], songIds: ['s11', 's12', 's6', 's1'] },
-  { id: 'e5', name: 'Grabado en GrooveSpace', desc: 'Todo el catálogo, de punta a punta.', colors: ['#4db8ff', '#1b2a8a'], songIds: SONGS.map((x) => x.id) },
+  { id: 'e5', name: 'Grabado en GrooveSpace', desc: 'Todo el catálogo, de punta a punta.', colors: ['#4db8ff', '#1b2a8a'], songIds: SEED_SONGS.map((x) => x.id) },
   { id: 'e7', name: 'Clásicos de referencia', desc: 'Contenido de prueba: audio y video oficial.', colors: ['#fde047', '#dc2626'], songIds: ['y7', 'y8', 'y9', 'y1', 'y2', 'y5'] },
   { id: 'e6', name: 'Electrónica y cumbia', desc: 'Sintetizadores que no se quedan quietos.', colors: ['#b28aff', '#2cd5c4'], songIds: ['s7', 's8', 's9', 's10'] },
 ];
-export const playlistById = (id) => PLAYLISTS.find((p) => p.id === id);
 
-export const GENRES = ['Todo', 'Rock alternativo', 'Folk / Indie', 'Post-punk', 'Cumbia psicodélica', 'Electrónica', 'Metal progresivo', 'Rock clásico', 'Grunge', 'Pop / Rock'];
 
-export const bandById = (id) => BANDS.find((b) => b.id === id);
-export const songById = (id) => SONGS.find((s) => s.id === id);
-export const songsOfBand = (id) => SONGS.filter((s) => s.bandId === id);
 
-// Reglas de acreditación (documento legal / modelo de negocio).
+// Arreglos "vivos": se modifican en su sitio para que todos los módulos vean el catálogo nuevo.
+export const BANDS = [];
+export const SONGS = [];
+export const ADS = [];
+export const PLAYLISTS = [];
+export const GENRES = ['Todo'];
 export const RULES = {
   creditPerPlay: 1,
   bonusPlays: 100,
@@ -84,3 +86,19 @@ export const RULES = {
   maxBookingShare: 0.5,
   expiryMonths: 12,
 };
+
+const replace = (target, items) => { target.length = 0; target.push(...items); };
+
+export function setCatalog({ bands, songs, ads, playlists, rules }) {
+  replace(BANDS, bands); replace(SONGS, songs); replace(ADS, ads || []); replace(PLAYLISTS, playlists || []);
+  replace(GENRES, ['Todo', ...[...new Set(bands.map((b) => b.genre).filter(Boolean))]]);
+  if (rules) Object.assign(RULES, rules);
+}
+
+export const playlistById = (id) => PLAYLISTS.find((p) => p.id === id);
+export const bandById = (id) => BANDS.find((b) => b.id === id);
+export const songById = (id) => SONGS.find((s) => s.id === id);
+export const songsOfBand = (id) => SONGS.filter((s) => s.bandId === id);
+
+// Modo demostración (sin backend): carga los datos de muestra al importar.
+if (!API_URL) setCatalog({ bands: SEED_BANDS, songs: SEED_SONGS, ads: SEED_ADS, playlists: SEED_PLAYLISTS });

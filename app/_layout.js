@@ -7,6 +7,7 @@ import { AppProvider } from '../src/store';
 import Toast from '../src/components/Toast';
 import SongSheet from '../src/components/SongSheet';
 import YouTubeEngine from '../src/components/YouTubeEngine';
+import OnboardingTour from '../src/components/OnboardingTour';
 import { useTheme } from '../src/theme';
 
 function Shell() {
@@ -26,6 +27,7 @@ function Shell() {
           <YouTubeEngine />
           <SongSheet />
           <Toast />
+          <OnboardingTour />
         </View>
   );
 }

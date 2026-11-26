@@ -3,11 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { Linking } from 'react-native';
-import { SONGS, RULES, songById, bandById, playlistById } from './data';
-import { reportValidPlay } from './lib/api';
-import { LOCK_SCREEN } from './lib/config';
+import { SONGS, RULES, songById, bandById, playlistById, setCatalog } from './data';
+import { completePlay, fetchCatalog, normalizeCatalog, startPlay } from './lib/api';
+import { API_URL, LOCK_SCREEN } from './lib/config';
 
 const KEY = 'groovespace-music-v2';
+const CATALOG_KEY = 'groovespace-catalog-v1';
 const Ctx = createContext(null);
 const StatusCtx = createContext({ playing: false, currentTime: 0, duration: 0, didJustFinish: false, error: null });
 export const useApp = () => useContext(Ctx);
@@ -39,6 +40,10 @@ export function AppProvider({ children }) {
   const videoMode = viewMode === 'video';
   const [themeMode, setThemeMode] = useState('system'); // system | light | dark
   const [videoRect, setVideoRect] = useState(null);
+  const [catalogVersion, setCatalogVersion] = useState(0);
+  const [catalogStatus, setCatalogStatus] = useState(API_URL ? 'loading' : 'ok'); // loading | ok | cached | offline
+  const [tourPending, setTourPending] = useState(false);
+  const playRef = useRef(null); // { songId, playId } de la reproducción abierta en el servidor
   const [ytId, setYtId] = useState(null);
   const [ytStatus, setYtStatus] = useState({ playing: false, currentTime: 0, duration: 0, didJustFinish: false, error: null });
   const ytRef = useRef(null);
@@ -46,6 +51,29 @@ export function AppProvider({ children }) {
   const player = useAudioPlayer(null);
   const audioStatus = useAudioPlayerStatus(player);
   const loaded = useRef(null);
+
+  // Trae bandas, logos, demos publicados y letras desde el sitio web de GrooveSpace.
+  const refreshCatalog = useCallback(async () => {
+    if (!API_URL) return;
+    setCatalogStatus('loading');
+    try {
+      const { raw } = await fetchCatalog();
+      setCatalog(normalizeCatalog(raw));
+      setCatalogVersion((v) => v + 1);
+      setCatalogStatus('ok');
+      AsyncStorage.setItem(CATALOG_KEY, JSON.stringify(raw)).catch(() => {});
+    } catch (e) { setCatalogStatus(SONGS.length ? 'cached' : 'offline'); }
+  }, []);
+
+  // Al cambiar el catálogo: la cola y los favoritos/listas no deben apuntar a canciones que ya no existen.
+  useEffect(() => {
+    if (!API_URL || !catalogVersion) return;
+    const ok = new Set(SONGS.map((x) => x.id));
+    setQueue((q) => { const next = q.filter((id) => ok.has(id)); return next.length ? next : SONGS.map((x) => x.id); });
+    setFavorites((f) => f.filter((id) => ok.has(id)));
+    setRecent((r) => r.filter((id) => ok.has(id)));
+    setPlaylists((p) => p.map((l) => ({ ...l, songIds: l.songIds.filter((id) => ok.has(id)) })));
+  }, [catalogVersion]);
 
   useEffect(() => {
     (async () => {
@@ -55,17 +83,22 @@ export function AppProvider({ children }) {
           const s = JSON.parse(raw);
           setUser(s.user || null); setPremium(!!s.premium); setCard(s.card || null); setFavorites(s.favorites || []);
           setRecent(s.recent || []); setCredited(s.credited || {}); setPlays(s.plays || 0);
-          setPlaylists(s.playlists || []); setFollowed(s.followed || []); setThemeMode(s.themeMode || 'system');
+          setPlaylists(s.playlists || []); setFollowed(s.followed || []); setThemeMode(s.themeMode || 'system'); setTourPending(!!s.tourPending);
         }
       } catch (e) { /* sin datos previos */ }
+      if (API_URL) {
+        // Copia guardada del último catálogo: la app abre al instante y funciona sin internet.
+        try { const cached = await AsyncStorage.getItem(CATALOG_KEY); if (cached) { setCatalog(normalizeCatalog(JSON.parse(cached))); setCatalogVersion((v) => v + 1); } } catch (e) { /* sin copia */ }
+      }
       setReady(true);
+      refreshCatalog();
     })();
     setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: LOCK_SCREEN, interruptionMode: 'doNotMix' }).catch(() => {});
   }, []);
   useEffect(() => {
     if (!ready) return;
-    AsyncStorage.setItem(KEY, JSON.stringify({ user, premium, card, favorites, recent, credited, plays, playlists, followed, themeMode })).catch(() => {});
-  }, [ready, user, premium, card, favorites, recent, credited, plays, playlists, followed, themeMode]);
+    AsyncStorage.setItem(KEY, JSON.stringify({ user, premium, card, favorites, recent, credited, plays, playlists, followed, themeMode, tourPending })).catch(() => {});
+  }, [ready, user, premium, card, favorites, recent, credited, plays, playlists, followed, themeMode, tourPending]);
 
   const showToast = useCallback((msg) => setToast({ msg, id: Date.now() }), []);
   const current = currentId ? songById(currentId) : null;
@@ -93,6 +126,10 @@ export function AppProvider({ children }) {
     tap();
     setCurrentId(songId);
     setRecent((r) => [songId, ...r.filter((x) => x !== songId)].slice(0, 20));
+    playRef.current = null;
+    if (song.remote && user?.token && user.role === 'listener') {
+      startPlay(user.token, songId).then((r) => { playRef.current = { songId, playId: r.playId }; }).catch(() => {});
+    }
     if (song.yt) {
       try { player.pause(); } catch (e) {}
       loaded.current = null;
@@ -107,7 +144,7 @@ export function AppProvider({ children }) {
       if (LOCK_SCREEN) try { player.setActiveForLockScreen(true, { title: song.title, artist: bandById(song.bandId).name, albumTitle: 'GrooveSpace Music' }); } catch (e) {}
     } else { try { player.seekTo(0); } catch (e) {} }
     player.play();
-  }, [player, ytId, ytCmd]);
+  }, [player, ytId, ytCmd, user]);
 
   const toggle = useCallback(() => {
     if (!current) return;
@@ -154,14 +191,28 @@ export function AppProvider({ children }) {
   }, [status.didJustFinish]); // eslint-disable-line
 
   // Reproducción válida: sesión iniciada, >= 30 s, una pagada por canción y día.
+  // Con backend, el servidor mide el tiempo y decide el abono; sin backend se simula localmente.
   useEffect(() => {
     if (!current || !user || isBand || !status.playing || band?.provisional) return;
     if (status.currentTime < RULES.minSeconds) return;
     const k = `${current.id}|${today()}`;
     if (credited[k]) return;
+    if (current.remote) {
+      const open = playRef.current;
+      if (!open || open.songId !== current.id) return; // todavía no se abrió en el servidor
+      playRef.current = null;
+      setCredited((c) => ({ ...c, [k]: true }));
+      completePlay(user.token, open.playId).then((r) => {
+        if (r.credited > 0) {
+          setPlays((n) => n + 1);
+          showToast(`+$${r.credited} MXN para ${band.name}`);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        }
+      }).catch(() => {});
+      return;
+    }
     setCredited((c) => ({ ...c, [k]: true }));
     setPlays((n) => n + 1);
-    reportValidPlay({ songId: current.id, bandId: current.bandId });
     showToast(`+$${RULES.creditPerPlay} MXN para ${band.name}`);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
   }, [status.currentTime, status.playing, current, user, credited]); // eslint-disable-line
@@ -188,14 +239,14 @@ export function AppProvider({ children }) {
   const getPlaylist = useCallback((id) => playlistById(id) || playlists.find((l) => l.id === id), [playlists]);
 
   const value = useMemo(() => ({
-    ready, user, setUser, isBand, premium, setPremium, card, subscribe: (c) => { setCard(c); setPremium(true); }, cancelPremium: () => { setCard(null); setPremium(false); }, favorites, toggleFav, recent, plays,
+    ready, user, setUser, catalogVersion, catalogStatus, refreshCatalog, tourPending, startTour: () => setTourPending(true), finishTour: () => setTourPending(false), isBand, premium, setPremium, card, subscribe: (c) => { setCard(c); setPremium(true); }, cancelPremium: () => { setCard(null); setPremium(false); }, favorites, toggleFav, recent, plays,
     current, band, playing, play, toggle, step, seek, queue, context, toast, showToast, adGate,
     shuffle, repeat, toggleShuffle, cycleRepeat, enqueueNext,
     playlists, createPlaylist, addToPlaylist, removeFromPlaylist, deletePlaylist, getPlaylist,
     followed, toggleFollow, sheetSong, openSheet: setSheetSong, closeSheet: () => setSheetSong(null),
     logout: () => { setUser(null); try { player.pause(); } catch (e) {} ytCmd('pause'); },
     isYt, videoMode, viewMode, themeMode, setThemeMode, setMode, videoRect, setVideoRect, ytRef, ytId, onYtMessage, openOnYoutube,
-  }), [ready, user, isBand, premium, card, favorites, recent, plays, current, band, playing, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, viewMode, themeMode, videoRect, ytId]); // eslint-disable-line
+  }), [ready, catalogVersion, catalogStatus, tourPending, user, isBand, premium, card, favorites, recent, plays, current, band, playing, queue, context, toast, adGate, shuffle, repeat, playlists, followed, sheetSong, isYt, viewMode, themeMode, videoRect, ytId]); // eslint-disable-line
 
   const statusValue = useMemo(() => status, [status.playing, status.currentTime, status.duration, status.didJustFinish, status.error]); // eslint-disable-line
   return <Ctx.Provider value={value}><StatusCtx.Provider value={statusValue}>{children}</StatusCtx.Provider></Ctx.Provider>;

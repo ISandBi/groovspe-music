@@ -19,6 +19,7 @@ export default function Cover({ band, size = 56, radius = 10, style, seed = 0, e
         <View style={[s.ring, { width: size * 0.6, height: size * 0.6, borderRadius: size, left: -size * 0.15, bottom: -size * 0.2 }]} />
         <Text style={[s.txt, { fontSize: size * 0.3, left: size * 0.1, bottom: size * 0.07 }]}>{initials}</Text>
       </LinearGradient>
+      {band.logo ? <Image source={{ uri: band.logo }} resizeMode="cover" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} /> : null}
       {art ? <Image source={{ uri: art }} resizeMode="cover" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} /> : null}
     </View>
   );

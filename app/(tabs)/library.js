@@ -9,14 +9,16 @@ import Header from '../../src/components/Header';
 import SongRow from '../../src/components/SongRow';
 import { useTheme } from '../../src/theme';
 import { PLAYLISTS as ALL_LISTS, BANDS, SONGS, bandById, songById } from '../../src/data';
+// catalogVersion fuerza el redibujado cuando llega el catálogo.
 import { useApp } from '../../src/store';
 
-const PLAYLISTS = [...ALL_LISTS].sort((a, b) => (b.id === 'e7') - (a.id === 'e7'));
-const TOP = [...BANDS].sort((a, b) => b.listeners - a.listeners);
 
 export default function Library() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { favorites, playlists, followed, recent, createPlaylist } = useApp();
+  const { favorites, playlists, followed, recent, createPlaylist, catalogVersion } = useApp();
+  // Se calcula en cada render: el catálogo llega del sitio web después de abrir la app.
+  const PLAYLISTS = [...ALL_LISTS].sort((a, b) => (b.id === 'e7') - (a.id === 'e7'));
+  const TOP = [...BANDS].sort((a, b) => b.listeners - a.listeners);
   const router = useRouter();
   const [view, setView] = useState(null); // null | listas | bandas | canciones
   const [asking, setAsking] = useState(false);

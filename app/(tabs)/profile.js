@@ -11,7 +11,7 @@ import { useApp } from '../../src/store';
 
 export default function Profile() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { user, setUser, premium, plays, favorites, logout } = useApp();
+  const { user, setUser, premium, plays, favorites, logout, startTour } = useApp();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
   const save = () => { if (name.trim().length >= 2) setUser({ ...user, name: name.trim() }); setEditing(false); };
@@ -68,6 +68,14 @@ export default function Profile() {
             <Text style={[type.body, { flex: 1, fontSize: 14, lineHeight: 20 }]}>{t}</Text>
           </View>
         ))}
+      </View>
+
+      <View style={s.group}>
+        <Press onPress={() => { startTour(); router.push('/(tabs)/home'); }} scale={0.99} style={s.switchRow}>
+          <Ionicons name="compass-outline" size={22} color={colors.accent} />
+          <View style={{ flex: 1 }}><Text style={type.h3}>Rehacer recorrido</Text><Text style={type.small}>Vuelve a ver cómo moverte por la app.</Text></View>
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </Press>
       </View>
 
       <View style={s.group}>
