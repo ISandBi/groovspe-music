@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "GrooveSpace Music",
-    "slug": "groovspe-music",
+    "slug": "groovspace-music",
     "scheme": "groovespacemusic",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,17 +11,49 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "mx.groovespace.music",
-      "infoPlist": { "UIBackgroundModes": ["audio"] }
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
     },
     "android": {
       "package": "mx.groovespace.music",
-      "permissions": ["FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MEDIA_PLAYBACK"]
+      "permissions": [
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
-    "web": { "bundler": "metro" },
+    "web": {
+      "bundler": "metro"
+    },
     "plugins": [
       "expo-router",
-      ["expo-audio", { "enableBackgroundPlayback": true, "recordAudioAndroid": false, "microphonePermission": false }]
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+          "recordAudioAndroid": false,
+          "microphonePermission": false
+        }
+      ]
     ],
-    "experiments": { "typedRoutes": false }
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "503ae629-5e44-444a-b663-091b7eeb39b1"
+      }
+    },
+    "owner": "omegadev22s-team"
   }
 }
