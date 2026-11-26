@@ -139,7 +139,7 @@ export function AppProvider({ children }) {
     }
     ytCmd('pause'); setViewMode((m) => (m === 'video' ? 'lyrics' : m));
     if (loaded.current !== songId) {
-      player.replace({ uri: song.url });
+      try { player.replace({ uri: song.url }); } catch (e) { showToast('No se pudo cargar el audio de esta canción.'); }
       loaded.current = songId;
       if (LOCK_SCREEN) try { player.setActiveForLockScreen(true, { title: song.title, artist: bandById(song.bandId).name, albumTitle: 'GrooveSpace Music' }); } catch (e) {}
     } else { try { player.seekTo(0); } catch (e) {} }
