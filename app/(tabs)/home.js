@@ -130,8 +130,8 @@ export default function Home() {
 const makeS = (colors, type) => StyleSheet.create({
   avatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   empty: { alignItems: 'center', gap: 10, marginHorizontal: 20, marginTop: 28, padding: 24, backgroundColor: colors.surface, borderRadius: 16 },
-  retry: { marginTop: 6, backgroundColor: colors.accent, borderRadius: 20, paddingHorizontal: 22, paddingVertical: 10 },
-  retryTxt: { color: '#fff', fontWeight: '700' },
+  retry: { marginTop: 6, alignSelf: 'center', borderWidth: 1, borderColor: colors.accent, borderRadius: 20, paddingHorizontal: 18, paddingVertical: 8 },
+  retryTxt: { color: colors.accent, fontWeight: '700', fontSize: 14 },
   avatarTxt: { color: '#fff', fontWeight: '800', fontSize: 16 },
   impact: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 20, backgroundColor: colors.surface, borderRadius: 14, padding: 14 },
   impactIcon: { width: 44, height: 44, borderRadius: 10, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
