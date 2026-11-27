@@ -75,7 +75,7 @@ export default function Player() {
               <Lyrics song={current} band={band} currentTime={elapsed} onSeek={seek} height={art} />
             ) : (
               <Animated.View style={{ transform: [{ scale: videoMode ? 1 : scale }], opacity: videoMode && isYt ? 0 : 1 }}>
-                <Cover band={band} size={art} radius={14} seed={current.id} elevated />
+                <Cover band={band} size={art} radius={14} seed={current.id} elevated cover={current.cover} />
               </Animated.View>
             )}
           </View>

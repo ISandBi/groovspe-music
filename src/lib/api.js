@@ -41,7 +41,7 @@ export function normalizeCatalog(raw) {
   }));
   const songs = (raw.songs || []).filter((s) => bands.some((b) => b.id === s.bandId)).map((s) => ({
     id: s.id, bandId: s.bandId, title: s.title, url: abs(s.streamPath), duration: s.duration || 0, plays: s.plays || 0,
-    lyrics: s.lyrics || '', kind: s.kind, publishedAt: s.publishedAt || '', remote: true,
+    lyrics: s.lyrics || '', cover: abs(s.cover), kind: s.kind, publishedAt: s.publishedAt || '', remote: true,
   }));
   return { bands, songs, ads: raw.ads || [], playlists: buildPlaylists(songs, bands), rules: raw.rules };
 }

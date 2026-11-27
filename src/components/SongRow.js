@@ -19,7 +19,7 @@ export default function SongRow({ song, list, index, context, showPlays = true }
     <Press onPress={() => play(song.id, list, context)} onLongPress={() => openSheet(song.id)} scale={0.99} style={s.row} accessibilityRole="button" accessibilityLabel={`Reproducir ${song.title} de ${band.name}`}>
       {index != null && <View style={s.idxBox}>{active ? <EqBars active={playing} /> : <Text style={s.idx}>{index + 1}</Text>}</View>}
       <View>
-        <Cover band={band} size={48} radius={6} seed={song.id} />
+        <Cover band={band} size={48} radius={6} seed={song.id} cover={song.cover} />
         {active && index == null && <View style={s.over}><EqBars active={playing} color="#fff" height={14} /></View>}
       </View>
       <View style={s.text}>
