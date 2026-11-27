@@ -15,8 +15,12 @@ export async function getLyrics(song, band) {
   let result = null;
   const own = SONG_LYRICS[song.id];
   // Letra que la banda publicó desde el sitio web: se reparte a lo largo de la canción (sin tiempos exactos).
+  // Si la banda marcó el tiempo de cada línea ([mm:ss.xx] texto), la letra va sincronizada con la canción.
+  const timed = !own && song.lyrics && /\[\d+:\d+(?:\.\d+)?\]/.test(song.lyrics) ? parseLrc(song.lyrics) : null;
   const site = !own && song.lyrics ? song.lyrics.split('\n').map((x) => x.trim()).filter(Boolean) : null;
-  if (site?.length) {
+  if (timed?.length) {
+    result = { synced: true, source: 'GrooveSpace', lines: timed };
+  } else if (site?.length) {
     const start = 10; const end = (song.duration || 0) * 0.88;
     const step = end > start ? (end - start) / site.length : 0;
     result = { synced: step > 0, source: 'GrooveSpace', lines: site.map((text, i) => ({ t: step ? start + i * step : 0, text })) };
