@@ -61,7 +61,7 @@ export default function Learn() {
       ) : (
         <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insets.bottom + 40 }} showsVerticalScrollIndicator={false}>
           <View style={s.head}>
-            <Cover band={band} size={72} radius={10} seed={song.id} elevated />
+            <Cover band={band} size={72} radius={10} seed={song.id} elevated cover={song.cover} />
             <View style={{ flex: 1 }}>
               <Text style={type.label}>APRENDE A TOCAR</Text>
               <Text style={type.h1} numberOfLines={2}>{song.title}</Text>

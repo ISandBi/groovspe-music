@@ -24,7 +24,7 @@ export default function MiniPlayer({ bottom }) {
       <BlurView tint={dark ? 'dark' : 'light'} intensity={90} style={s.blur}>
         <View style={[s.tint, { backgroundColor: colors.glass }]} />
         <Pressable onPress={() => router.push('/player')} style={s.row} accessibilityLabel="Abrir reproductor">
-          <Cover band={band} size={42} radius={6} seed={current.id} />
+          <Cover band={band} size={42} radius={6} seed={current.id} cover={current.cover} />
           <View style={{ flex: 1 }}>
             <Text numberOfLines={1} style={s.title}>{current.title}</Text>
             <View style={s.sub}>

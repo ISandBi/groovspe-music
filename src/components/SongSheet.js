@@ -45,7 +45,7 @@ export default function SongSheet() {
       <Animated.View style={[s.sheet, { paddingBottom: insets.bottom + 12, transform: [{ translateY: y }] }]}>
         <View style={s.grab} />
         <View style={s.head}>
-          <Cover band={band} size={52} radius={8} seed={song.id} />
+          <Cover band={band} size={52} radius={8} seed={song.id} cover={song.cover} />
           <View style={{ flex: 1 }}>
             <Text style={s.title} numberOfLines={1}>{song.title}</Text>
             <Text style={s.sub} numberOfLines={1}>{band.name}</Text>

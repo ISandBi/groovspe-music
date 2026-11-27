@@ -5,7 +5,7 @@ import { shadow, useTheme } from '../theme';
 import { useArtwork } from '../lib/artwork';
 
 // Carátula generada: degradado de la banda + iniciales. `elevated` añade la sombra suave tipo álbum.
-export default function Cover({ band, size = 56, radius = 10, style, seed = 0, elevated }) {
+export default function Cover({ band, size = 56, radius = 10, style, seed = 0, elevated, cover }) {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
   const art = useArtwork(seed);
   const n = typeof seed === 'number' ? seed : [...String(seed)].reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -20,6 +20,7 @@ export default function Cover({ band, size = 56, radius = 10, style, seed = 0, e
         <Text style={[s.txt, { fontSize: size * 0.3, left: size * 0.1, bottom: size * 0.07 }]}>{initials}</Text>
       </LinearGradient>
       {band.logo ? <Image source={{ uri: band.logo }} resizeMode="cover" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} /> : null}
+      {cover ? <Image source={{ uri: cover }} resizeMode="cover" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} /> : null}
       {art ? <Image source={{ uri: art }} resizeMode="cover" style={[StyleSheet.absoluteFill, { borderRadius: radius }]} /> : null}
     </View>
   );
