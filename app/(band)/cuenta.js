@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,7 +11,8 @@ import { useApp } from '../../src/store';
 
 export default function Cuenta() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { user, setUser } = useApp();
+  const { user, logout } = useApp();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   return (
     <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 130, paddingHorizontal: 20 }}>
@@ -18,15 +20,15 @@ export default function Cuenta() {
         <Text style={type.h1}>Cuenta de banda</Text>
       </FadeIn>
       <FadeIn delay={120} style={s.card}>
-        <Row icon="musical-notes" label="Banda" value={user.bandName} />
-        <Row icon="person" label="Líder" value={user.name} />
-        <Row icon="mail" label="Correo" value={user.email} />
+        <Row icon="musical-notes" label="Banda" value={user?.bandName} />
+        <Row icon="person" label="Líder" value={user?.name} />
+        <Row icon="mail" label="Correo" value={user?.email} />
       </FadeIn>
       <FadeIn delay={200} style={{ marginTop: 16 }}>
         <Text style={[type.body, { fontSize: 13 }]}>Para editar integrantes, contratos o pagos, usa el sitio de GrooveSpace con la misma cuenta.</Text>
       </FadeIn>
       <View style={{ marginTop: 20, backgroundColor: colors.surface, borderRadius: 12 }}><AppearancePicker /></View>
-      <Press onPress={() => setUser(null)} style={s.logout}>
+      <Press onPress={() => { router.replace('/welcome'); logout(); }} style={s.logout}>
         <Ionicons name="log-out-outline" size={18} color={colors.pink} />
         <Text style={{ color: colors.pink, fontWeight: '700' }}>Cerrar sesión</Text>
       </Press>

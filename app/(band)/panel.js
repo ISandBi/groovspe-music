@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState, useMemo } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,7 +12,8 @@ import { bandFetch } from '../../src/lib/api';
 
 export default function BandPanel() {
   const { colors, type } = useTheme(); const s = useMemo(() => makeS(colors, type), [colors]);
-  const { user, plays, setUser } = useApp();
+  const { user, plays, logout } = useApp();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [demos, setDemos] = useState([]);
   const [note, setNote] = useState('');
@@ -19,7 +21,7 @@ export default function BandPanel() {
 
   const load = async () => {
     setRefreshing(true);
-    try { setDemos(await bandFetch('/api/demos/mine', user.token)); setNote(''); }
+    try { setDemos(await bandFetch('/api/demos/mine', user?.token)); setNote(''); }
     catch (e) { setNote(e.message); }
     finally { setRefreshing(false); }
   };
@@ -30,8 +32,8 @@ export default function BandPanel() {
     <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 130, paddingHorizontal: 20 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={load} tintColor={colors.lime} />} showsVerticalScrollIndicator={false}>
       <FadeIn>
         <Text style={type.label}>Panel de banda</Text>
-        <Text style={[type.h1, { marginTop: 2 }]}>{user.bandName}</Text>
-        <Text style={type.small}>Líder: {user.name}</Text>
+        <Text style={[type.h1, { marginTop: 2 }]}>{user?.bandName}</Text>
+        <Text style={type.small}>Líder: {user?.name}</Text>
       </FadeIn>
 
       <FadeIn delay={120}>
@@ -61,7 +63,7 @@ export default function BandPanel() {
         ))}
       </FadeIn>
 
-      <Press onPress={() => setUser(null)} style={s.logout}>
+      <Press onPress={() => { router.replace('/welcome'); logout(); }} style={s.logout}>
         <Ionicons name="log-out-outline" size={18} color={colors.pink} />
         <Text style={{ color: colors.pink, fontWeight: '700' }}>Cerrar sesión</Text>
       </Press>
