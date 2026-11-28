@@ -12,6 +12,9 @@ import { BRAND_NAME, PLAN, getLog, logEvent } from '../src/lib/payments';
 const PERKS = [
   ['school', 'Aprende a tocar', 'Acordes, diagramas de guitarra, tempo, metrónomo y letra con acordes sincronizada con la canción.'],
   ['ban', 'Sin anuncios', 'Escucha sin los anuncios de GrooveSpace.'],
+  ['play-circle', 'Reproducción en segundo plano', 'Sigue escuchando con la pantalla apagada o con otras apps abiertas (próximamente).'],
+  ['notifications', 'Notificaciones', 'Avisos de canciones nuevas y eventos de GrooveSpace (próximamente).'],
+  ['cloud-download', 'Descargas', 'Guarda la música para escucharla sin conexión (próximamente).'],
   ['heart', 'Apoya a las bandas', 'Tus reproducciones válidas siguen sumando saldo para las bandas, igual que en el plan gratuito.'],
 ];
 const EVENT = { pago_iniciado: 'Pago iniciado', pago_aprobado: 'Pago aprobado', pago_rechazado: 'Pago rechazado', pago_bloqueado: 'Pago bloqueado', suscripcion_cancelada: 'Suscripción cancelada' };
